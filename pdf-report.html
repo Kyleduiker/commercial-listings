@@ -342,14 +342,17 @@ function renderCoverPage(agentName){
     <div class="cover-left-bar"></div>
     <div class="cover-top-bar"></div>
     <div class="cover-logo-wrap">
-      <div class="cover-logo-bars">
-        <div class="cover-logo-bar"></div><div class="cover-logo-bar"></div>
-        <div class="cover-logo-bar"></div><div class="cover-logo-bar"></div>
-        <div class="cover-logo-bar"></div>
+      <img src="https://drive.google.com/uc?export=view&id=1zzCtg0qk4p2cLYN__jriV_f_2QVMxCy3" alt="Royal LePage Commercial" style="height:80px;width:auto;display:block;margin:0 auto 24px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <div style="display:none">
+        <div class="cover-logo-bars">
+          <div class="cover-logo-bar"></div><div class="cover-logo-bar"></div>
+          <div class="cover-logo-bar"></div><div class="cover-logo-bar"></div>
+          <div class="cover-logo-bar"></div>
+        </div>
+        <div class="cover-rlp">Royal LePage®</div>
+        <div class="cover-commercial">Commercial™</div>
+        <div class="cover-solutions">Royal LePage® Solutions</div>
       </div>
-      <div class="cover-rlp">Royal LePage®</div>
-      <div class="cover-commercial">Commercial™</div>
-      <div class="cover-solutions">Royal LePage® Solutions</div>
     </div>
     <div class="cover-title">Commercial Listings</div>
     <div class="cover-month">${REPORT_MONTH}</div>
@@ -432,6 +435,9 @@ function renderRosterPage(agents){
   return`<div class="pdf-page roster-page">
     <div class="roster-header">Our Associates</div>
     <div class="roster-grid">${cards}</div>
+    <div style="text-align:center;margin-top:32px;padding-top:24px;border-top:1px solid #eee;">
+      <img src="https://drive.google.com/uc?export=view&id=18AMz4wqTMO0_PGrm66Ir8A0RRaZxVvJT" alt="Royal LePage Solutions" style="height:44px;width:auto;display:inline-block;" onerror="this.style.display='none'">
+    </div>
   </div>`;
 }
 
@@ -444,7 +450,10 @@ function renderAgentFooterPage(agent){
     <div class="agent-footer-title">${(agent.title||'Associate\nCommercial Division').replace(/\n/g,'<br>')}</div>
     <div class="agent-footer-phone">${agent.phone}</div>
     <div class="agent-footer-email">${agent.email}</div>
-    <div class="agent-footer-brand">Royal LePage® Solutions — Commercial Division · www.royallepagesolutions.com</div>
+    <div class="agent-footer-brand">
+      <img src="https://drive.google.com/uc?export=view&id=18AMz4wqTMO0_PGrm66Ir8A0RRaZxVvJT" alt="Royal LePage Solutions" style="height:52px;width:auto;display:block;margin:0 auto 12px;opacity:0.85;" onerror="this.style.display='none'">
+      <div>Royal LePage® Solutions — Commercial Division · www.royallepagesolutions.com</div>
+    </div>
   </div>`;
 }
 
