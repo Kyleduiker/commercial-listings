@@ -225,9 +225,9 @@ const REPORT_MONTH = 'March 2026';
 
 const CAT_ORDER  = ['Industrial','Investment','Land','Office','Retail','Business'];
 const CAT_LABELS = {
-  Industrial:'Industrial For Sale / Lease', Investment:'Investment For Sale',
-  Land:'Land For Sale', Office:'Office For Sale / Lease',
-  Retail:'Retail For Sale / Lease', Business:'Businesses For Sale'
+  Industrial:'Industrial For Sale / Lease', Investment:'Investment For Sale / Lease',
+  Land:'Land For Sale / Lease', Office:'Office For Sale / Lease',
+  Retail:'Retail For Sale / Lease', Business:'Businesses For Sale / Lease'
 };
 
 const SAMPLE_LISTINGS = [
@@ -278,10 +278,10 @@ async function loadData(){
   try{
     const r1=await fetch(LISTINGS_CSV);
     const rows=csvToRows(await r1.text()).slice(1).filter(r=>r[0]);
-    allListings=rows.map(r=>({category:r[0]||'',address:r[1]||'',mls:r[2]||'',size:r[3]||'',type:r[4]||'Sale',price:r[5]||'',comments:r[6]||'',agent:r[7]||'',status:r[8]||'Active',photo:r[9]||'',brochure:r[10]||''}));
+    allListings=rows.map(r=>({category:r[0]||'',address:r[1]||'',mls:r[2]||'',size:r[3]||'',type:r[4]||'Sale',price:r[5]||'',comments:r[6]||'',agent:r[7]||'',status:r[8]||'Active',photo:r[9]||'',brochure:r[10]||'',agent2:r[11]||''}));
     const r2=await fetch(AGENTS_CSV);
     const ar=csvToRows(await r2.text()).slice(1).filter(r=>r[0]);
-    allAgents=ar.map(r=>({name:r[0]||'',title:r[1]||'',phone:r[2]||'',email:r[3]||'',photo:r[4]||''}));
+    allAgents=ar.map(r=>({name:r[0]||'',title:r[1]||'',phone:r[2]||'',email:r[3]||'',photo:r[4]||'',website:r[5]||''}));
     if(NEEDS_CSV){const r3=await fetch(NEEDS_CSV);const nr=csvToRows(await r3.text()).slice(1).filter(r=>r[0]);allNeeds=nr.map(r=>({category:r[0]||'',description:r[1]||'',budget:r[2]||'',location:r[3]||'',size:r[4]||'',agent:r[5]||'',date:r[6]||''}));}
     else allNeeds=SAMPLE_NEEDS;
     document.getElementById('statusMsg').textContent='Loaded '+allListings.length+' listings ✓';
@@ -328,7 +328,7 @@ function renderListingRow(l){
     <td class="td-type">${badgeHtml(l.status,l.type)}</td>
     <td class="td-price"><div class="price-val">${(l.price||'').replace(/\n/g,'<br>')}</div></td>
     <td>${bullets}</td>
-    <td class="td-contact"><div class="contact-nm">${l.agent||'—'}</div></td>
+    <td class="td-contact"><div class="contact-nm">${l.agent||'—'}</div>${l.agent2?`<div style="font-size:9.5px;color:#777;margin-top:2px;font-weight:600;">${l.agent2}</div>`:''}</td>
   </tr>`;
 }
 
@@ -431,6 +431,7 @@ function renderRosterPage(agents){
     <div class="roster-title">${(a.title||'').replace(/\n/g,'<br>')}</div>
     <div class="roster-phone">${a.phone}</div>
     <div class="roster-email">${a.email}</div>
+    ${a.website?`<div style="margin-top:4px;font-size:9px;color:#EA002A;">${a.website.replace('https://','').replace('http://','')}</div>`:''}
   </div>`).join('');
   return`<div class="pdf-page roster-page">
     <div class="roster-header">Our Associates</div>
@@ -450,6 +451,7 @@ function renderAgentFooterPage(agent){
     <div class="agent-footer-title">${(agent.title||'Associate\nCommercial Division').replace(/\n/g,'<br>')}</div>
     <div class="agent-footer-phone">${agent.phone}</div>
     <div class="agent-footer-email">${agent.email}</div>
+    ${agent.website?`<div style="margin-top:8px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#EA002A;">${agent.website.replace('https://','').replace('http://','')}</div>`:''}
     <div class="agent-footer-brand">
       <img src="https://drive.google.com/uc?export=view&id=18AMz4wqTMO0_PGrm66Ir8A0RRaZxVvJT" alt="Royal LePage Solutions" style="height:52px;width:auto;display:block;margin:0 auto 12px;opacity:0.85;" onerror="this.style.display='none'">
       <div>Royal LePage® Solutions — Commercial Division · www.royallepagesolutions.com</div>
@@ -459,7 +461,7 @@ function renderAgentFooterPage(agent){
 
 function renderPages(){
   const isAgent = currentAgent !== 'all';
-  const listings = isAgent ? allListings.filter(l=>l.agent===currentAgent) : allListings;
+  const listings = isAgent ? allListings.filter(l=>l.agent===currentAgent||l.agent2===currentAgent) : allListings;
   const activeCats = CAT_ORDER.filter(c=>listings.some(l=>l.category===c));
   const agentObj = isAgent ? (allAgents.find(a=>a.name===currentAgent)||{name:currentAgent,title:'Associate\nCommercial Division',phone:'',email:'',photo:''}) : null;
 
