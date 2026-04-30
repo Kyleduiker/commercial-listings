@@ -61,7 +61,7 @@ body { font-family: 'Open Sans', sans-serif; background: var(--off-white); color
 .cover-stat-label { font-family:'Montserrat',sans-serif; font-weight:600; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.35); margin-top:4px; }
 
 /* STICKY TABS */
-#catTabs { background:var(--dark); border-bottom:3px solid var(--red); position:sticky; top:68px; z-index:190; overflow-x:auto; scrollbar-width:none; }
+#catTabs { background:var(--dark); border-bottom:3px solid var(--red); position:sticky; top:0; z-index:190; overflow-x:auto; scrollbar-width:none; }
 #catTabs::-webkit-scrollbar { display:none; }
 .cat-tabs-inner { max-width:1280px; margin:0 auto; display:flex; padding:0 32px; }
 .cat-tab-btn { font-family:'Montserrat',sans-serif; font-weight:700; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.5); padding:13px 18px; border:none; background:transparent; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-3px; white-space:nowrap; transition:all .2s; text-decoration:none; display:block; }
@@ -173,8 +173,8 @@ footer { background:var(--dark); padding:32px; border-top:3px solid var(--red); 
 .footer-link:hover { color:var(--red); }
 .footer-copy { font-size:11px; color:rgba(255,255,255,.2); }
 
-@media print { #loadingOverlay,#topNav,#catTabs{display:none!important} body{background:white} .cat-section{page-break-inside:avoid} #agentsSection{page-break-before:always} .listings-table-wrap{overflow:visible} }
-@media (max-width:700px) { .nav-inner,.cover-inner,#mainContent,.cat-tabs-inner,.footer-inner{padding-left:16px;padding-right:16px} .cover-stats{display:none} .td-size,.td-comments{display:none} .nav-link{display:none} }
+@media print { #loadingOverlay,#catTabs{display:none!important} body{background:white} .cat-section{page-break-inside:avoid} #agentsSection{page-break-before:always} .listings-table-wrap{overflow:visible} }
+@media (max-width:700px) { .cover-inner,#mainContent,.cat-tabs-inner,.footer-inner{padding-left:16px;padding-right:16px} .cover-stats{display:none} .td-size,.td-comments{display:none} }
 </style>
 </head>
 <body>
@@ -185,39 +185,13 @@ footer { background:var(--dark); padding:32px; border-top:3px solid var(--red); 
   <div class="loader-sub">Loading current listings…</div>
 </div>
 
-<nav id="topNav">
-  <div class="nav-inner">
-    <a class="nav-logo" href="https://royallepagesolutions.com/commercial/">
-      <div class="logo-bars"><div class="logo-bar"></div><div class="logo-bar"></div><div class="logo-bar"></div><div class="logo-bar"></div><div class="logo-bar"></div></div>
-      <div><div class="logo-rlp">Royal LePage®</div><div class="logo-name">Solutions</div><div class="logo-div">Commercial Division</div></div>
-    </a>
-    <div class="nav-links">
-      <a class="nav-link" href="https://royallepagesolutions.com/">Home</a>
-      <a class="nav-link" href="https://royallepagesolutions.com/commercial-agents/">Agents</a>
-      <a class="nav-link" href="https://royallepagesolutions.com/contact/">Contact</a>
-      <a class="nav-phone" href="tel:+14032525900">+1 (403) 252-5900</a>
-      <div style="width:1px;height:24px;background:var(--border);"></div>
-      <button onclick="openPdf('all')" style="background:var(--red);color:#fff;border:none;padding:7px 14px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:10px;letter-spacing:1px;text-transform:uppercase;border-radius:3px;cursor:pointer;">⬇ Full PDF</button>
-      <select id="agentPdfSelect" style="background:var(--off-white);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:3px;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:700;cursor:pointer;" onchange="if(this.value)openPdf(this.value)">
-        <option value="">Agent PDF ▾</option>
-      </select>
-    </div>
-  </div>
-</nav>
+
 
 <div id="coverHeader">
   <div class="cover-red-stripe"></div>
-  <div class="cover-inner">
-    <div>
-      <img src="https://drive.google.com/uc?export=view&id=1zzCtg0qk4p2cLYN__jriV_f_2QVMxCy3" alt="Royal LePage Commercial" style="height:64px;width:auto;display:block;margin-bottom:18px;" onerror="this.style.display='none'">
-      <div class="cover-title">Commercial Listings</div>
-      <div class="cover-month" id="coverMonth">Loading…</div>
-      <div class="cover-url">www.royallepagesolutions.com/commercial</div>
-    </div>
-    <div class="cover-stats">
-      <div class="cover-stat"><div class="cover-stat-num" id="statListings">—</div><div class="cover-stat-label">Listings</div></div>
-      <div class="cover-stat"><div class="cover-stat-num" id="statCategories">—</div><div class="cover-stat-label">Categories</div></div>
-      <div class="cover-stat"><div class="cover-stat-num" id="statAgents">—</div><div class="cover-stat-label">Associates</div></div>
+  <div class="cover-inner" style="justify-content:center;">
+    <div style="text-align:center;">
+      <img src="https://kyleduiker.github.io/commercial-listings/media/2024%20RLP%20Commercial%20Logos_White-Red%20-%20Brokerage%20.png" alt="Royal LePage Commercial" style="height:140px;width:auto;display:block;margin:0 auto;" onerror="this.style.display='none'">
     </div>
   </div>
 </div>
@@ -408,14 +382,14 @@ function renderNeedsTable(needs){
 function render(){
   const month=CONFIG.REPORT_MONTH||'Monthly Report';
   const activeCats=CAT_ORDER.filter(c=>allListings.some(l=>l.category===c));
-  document.getElementById('coverMonth').textContent=month;
-  document.getElementById('statListings').textContent=allListings.length;
-  document.getElementById('statCategories').textContent=activeCats.length;
-  document.getElementById('statAgents').textContent=allAgents.length||[...new Set(allListings.map(l=>l.agent).filter(Boolean))].length;
+  const monthEl=document.getElementById('coverMonth');
+  if(monthEl)monthEl.textContent=month;
   document.getElementById('catTabsInner').innerHTML=
     activeCats.map(c=>`<a class="cat-tab-btn" href="#section-${c}">${c}</a>`).join('')+
     `<a class="cat-tab-btn" href="#needsSection">Needs &amp; Wants</a>`+
-    `<a class="cat-tab-btn" href="#agentsSection">Our Associates</a>`;
+    `<a class="cat-tab-btn" href="#agentsSection">Our Associates</a>`+
+    `<div style="flex:1"></div>`+
+    `<button onclick="openPdf('all')" style="background:var(--red);color:#fff;border:none;padding:0 18px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;height:100%;white-space:nowrap;">⬇ Download Monthly Vacancy Report</button>`;
   document.getElementById('sectionsWrap').innerHTML=
     activeCats.map(cat=>renderSection(cat,allListings.filter(l=>l.category===cat))).join('');
   // Needs & Wants
@@ -432,6 +406,7 @@ function render(){
         <div class="agent-phone">${a.phone}</div>
         <div class="agent-email">${a.email}</div>
         ${a.website?`<a href="${a.website.startsWith('http')?a.website:'https://'+a.website}" target="_blank" style="display:inline-block;margin-top:6px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--white);border:1px solid rgba(255,255,255,.4);padding:3px 8px;border-radius:2px;text-decoration:none;transition:all .15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='rgba(255,255,255,.4)';this.style.color='var(--white)'">🌐 Website</a>`:''}
+        <a href="pdf-report.html?agent=${encodeURIComponent(a.name)}" target="_blank" style="display:inline-block;margin-top:6px;margin-left:${a.website?'6px':'0'};font-family:'Montserrat',sans-serif;font-weight:700;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--white);border:1px solid rgba(234,0,42,.6);padding:3px 8px;border-radius:2px;text-decoration:none;transition:all .15s;" onmouseover="this.style.background='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(234,0,42,.6)'">⬇ My Listings PDF</a>
       </div>
     </div>`).join('');
   document.getElementById('agentsSection').style.display='block';
@@ -443,15 +418,6 @@ function render(){
 
 async function init(){
   await loadData();render();
-  // Populate agent PDF dropdown
-  const sel=document.getElementById('agentPdfSelect');
-  if(sel){
-    const agents=[...new Set([
-      ...allListings.map(l=>l.agent),
-      ...allListings.map(l=>l.agent2)
-    ].filter(Boolean))].sort();
-    agents.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;sel.appendChild(o);});
-  }
   const ol=document.getElementById('loadingOverlay');
   ol.classList.add('hidden');setTimeout(()=>ol.style.display='none',500);
 }
@@ -459,9 +425,6 @@ async function init(){
 function openPdf(agent){
   const url='pdf-report.html'+(agent&&agent!=='all'?'?agent='+encodeURIComponent(agent):'');
   window.open(url,'_blank');
-  // Reset agent select
-  const sel=document.getElementById('agentPdfSelect');
-  if(sel)setTimeout(()=>sel.value='',100);
 }
 init();
 </script>
