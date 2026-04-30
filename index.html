@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commercial Listings — Royal LePage Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #EA002A;
+  --black: #111111;
+  --dark: #1a1a1a;
+  --mid-grey: #444444;
+  --white: #ffffff;
+  --off-white: #f5f5f5;
+  --light: #eeeeee;
+  --border: #dddddd;
+  --text: #222222;
+  --muted: #777777;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Open Sans', sans-serif; background: var(--off-white); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+/* LOADING */
+#loadingOverlay { position:fixed; inset:0; background:var(--white); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.4s; }
+#loadingOverlay.hidden { opacity:0; pointer-events:none; }
+.loader-bars { display:flex; gap:4px; align-items:flex-end; margin-bottom:20px; }
+.loader-bar { background:var(--red); width:6px; border-radius:1px; animation:barPulse 0.9s ease-in-out infinite; }
+.loader-bar:nth-child(1){height:14px;animation-delay:0s} .loader-bar:nth-child(2){height:22px;animation-delay:.1s} .loader-bar:nth-child(3){height:30px;animation-delay:.2s} .loader-bar:nth-child(4){height:22px;animation-delay:.3s} .loader-bar:nth-child(5){height:14px;animation-delay:.4s}
+@keyframes barPulse { 0%,100%{opacity:.25;transform:scaleY(.7)} 50%{opacity:1;transform:scaleY(1)} }
+.loader-title { font-family:'Montserrat',sans-serif; font-weight:900; font-size:15px; letter-spacing:3px; text-transform:uppercase; color:var(--black); margin-bottom:6px; }
+.loader-sub { font-size:12px; color:var(--muted); letter-spacing:1px; }
+
+/* NAV */
+#topNav { background:var(--white); border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,.07); position:sticky; top:0; z-index:200; }
+.nav-inner { max-width:1280px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:0 32px; height:68px; }
+.nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+.logo-bars { display:flex; gap:2.5px; align-items:flex-end; }
+.logo-bar { background:var(--red); width:4px; }
+.logo-bar:nth-child(1){height:10px} .logo-bar:nth-child(2){height:17px} .logo-bar:nth-child(3){height:24px} .logo-bar:nth-child(4){height:17px} .logo-bar:nth-child(5){height:10px}
+.logo-rlp { font-family:'Montserrat',sans-serif; font-weight:800; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
+.logo-name { font-family:'Montserrat',sans-serif; font-weight:900; font-size:14px; letter-spacing:1.5px; text-transform:uppercase; color:var(--black); }
+.logo-div { font-family:'Montserrat',sans-serif; font-weight:700; font-size:9px; color:var(--red); letter-spacing:1.5px; text-transform:uppercase; }
+.nav-links { display:flex; align-items:center; gap:24px; }
+.nav-link { font-family:'Montserrat',sans-serif; font-weight:700; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color .2s; }
+.nav-link:hover { color:var(--red); }
+.nav-phone { font-family:'Montserrat',sans-serif; font-weight:800; font-size:12px; color:var(--red); text-decoration:none; }
+
+/* COVER */
+#coverHeader { background:var(--dark); position:relative; overflow:hidden; padding:52px 32px 48px; }
+#coverHeader::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(90deg,transparent,transparent 72px,rgba(234,0,42,.035) 72px,rgba(234,0,42,.035) 73px); }
+.cover-red-stripe { position:absolute; top:0; left:0; width:7px; height:100%; background:var(--red); }
+.cover-inner { max-width:1280px; margin:0 auto; position:relative; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:24px; }
+.cover-eyebrow { font-family:'Montserrat',sans-serif; font-weight:700; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.4); margin-bottom:10px; }
+.cover-title { font-family:'Montserrat',sans-serif; font-weight:900; font-size:clamp(28px,4vw,46px); color:var(--red); text-transform:uppercase; letter-spacing:-0.5px; line-height:1; margin-bottom:6px; }
+.cover-month { font-family:'Montserrat',sans-serif; font-weight:700; font-size:16px; color:var(--white); letter-spacing:3px; text-transform:uppercase; }
+.cover-url { font-size:11px; color:rgba(255,255,255,.3); letter-spacing:1px; margin-top:10px; font-style:italic; }
+.cover-stats { display:flex; gap:32px; flex-wrap:wrap; }
+.cover-stat-num { font-family:'Montserrat',sans-serif; font-weight:900; font-size:32px; color:var(--white); line-height:1; }
+.cover-stat-label { font-family:'Montserrat',sans-serif; font-weight:600; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.35); margin-top:4px; }
+
+/* STICKY TABS */
+#catTabs { background:var(--dark); border-bottom:3px solid var(--red); position:sticky; top:68px; z-index:190; overflow-x:auto; scrollbar-width:none; }
+#catTabs::-webkit-scrollbar { display:none; }
+.cat-tabs-inner { max-width:1280px; margin:0 auto; display:flex; padding:0 32px; }
+.cat-tab-btn { font-family:'Montserrat',sans-serif; font-weight:700; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.5); padding:13px 18px; border:none; background:transparent; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-3px; white-space:nowrap; transition:all .2s; text-decoration:none; display:block; }
+.cat-tab-btn:hover { color:var(--white); background:rgba(255,255,255,.05); }
+.cat-tab-btn.active { color:var(--white); border-bottom-color:var(--red); }
+
+/* MAIN */
+#mainContent { max-width:1280px; margin:0 auto; padding:40px 32px 80px; }
+
+/* SECTION HEADER — matches PDF */
+.cat-section { margin-bottom:48px; }
+.cat-section-header { display:flex; align-items:stretch; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+.cat-section-title { background:var(--red); padding:12px 24px; font-family:'Montserrat',sans-serif; font-weight:900; font-size:13px; letter-spacing:2.5px; text-transform:uppercase; color:var(--white); white-space:nowrap; display:flex; align-items:center; }
+.cat-section-tabs { background:var(--dark); display:flex; flex:1; overflow-x:auto; scrollbar-width:none; }
+.cat-section-tabs::-webkit-scrollbar { display:none; }
+.cat-section-tab { font-family:'Montserrat',sans-serif; font-weight:700; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.45); padding:12px 16px; white-space:nowrap; text-decoration:none; transition:all .15s; display:block; }
+.cat-section-tab:hover { color:var(--white); background:rgba(255,255,255,.06); }
+.cat-section-tab.this-cat { color:var(--white); background:rgba(255,255,255,.1); }
+
+/* TABLE */
+.listings-table-wrap { background:var(--white); border:1px solid var(--border); border-top:none; overflow-x:auto; }
+table.lt { width:100%; border-collapse:collapse; font-size:12.5px; }
+table.lt thead tr { background:#2e2e2e; }
+table.lt thead th { font-family:'Montserrat',sans-serif; font-weight:700; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.65); padding:11px 14px; text-align:left; border-right:1px solid rgba(255,255,255,.06); white-space:nowrap; }
+table.lt thead th:last-child { border-right:none; }
+table.lt tbody tr { border-bottom:1px solid var(--border); transition:background .12s; }
+table.lt tbody tr:last-child { border-bottom:none; }
+table.lt tbody tr:hover { background:#fafafa; }
+table.lt tbody tr:nth-child(even) { background:#fcfcfc; }
+table.lt tbody tr:nth-child(even):hover { background:#f5f5f5; }
+table.lt td { padding:14px; vertical-align:top; border-right:1px solid var(--border); line-height:1.5; }
+table.lt td:last-child { border-right:none; }
+
+/* Cells */
+.td-photo { width:90px; }
+.listing-photo { width:82px; height:62px; object-fit:cover; display:block; border-radius:1px; background:var(--light); }
+.listing-photo-ph { width:82px; height:62px; background:var(--light); display:flex; align-items:center; justify-content:center; font-size:22px; color:#ccc; border-radius:1px; }
+.td-property { min-width:170px; }
+.prop-address { font-family:'Montserrat',sans-serif; font-weight:800; font-size:12px; color:var(--black); margin-bottom:3px; line-height:1.3; }
+.prop-mls { font-size:10.5px; color:var(--muted); margin-bottom:5px; }
+.prop-brochure { display:inline-block; margin-top:5px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:var(--red); border:1px solid var(--red); padding:3px 9px; border-radius:2px; text-decoration:none; transition:all .15s; }
+.prop-brochure:hover { background:var(--red); color:var(--white); }
+.td-size { width:120px; font-size:11.5px; color:var(--mid-grey); white-space:pre-line; }
+.td-type { width:90px; }
+.td-price { width:130px; }
+.price-main { font-family:'Montserrat',sans-serif; font-weight:800; font-size:13px; color:var(--black); line-height:1.4; white-space:pre-line; }
+.td-comments { min-width:200px; }
+.comments-list { list-style:none; padding:0; }
+.comments-list li { padding-left:12px; position:relative; font-size:12px; color:#555; line-height:1.5; margin-bottom:2px; }
+.comments-list li::before { content:'·'; position:absolute; left:0; color:var(--red); font-weight:900; font-size:14px; line-height:1.3; }
+.td-contact { width:100px; }
+.contact-name { font-family:'Montserrat',sans-serif; font-weight:800; font-size:11.5px; color:var(--black); line-height:1.4; }
+
+/* BADGES */
+.badge { display:inline-block; padding:3px 9px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:9.5px; letter-spacing:1px; text-transform:uppercase; border-radius:2px; line-height:1.4; }
+.badge-sale   { background:rgba(234,0,42,.09); color:var(--red); }
+.badge-lease  { background:rgba(0,100,200,.08); color:#0055aa; }
+.badge-sold   { background:#ffebee; color:#c62828; }
+.badge-leased { background:#fff3e0; color:#e65100; }
+.badge-new    { background:#e8f5e9; color:#2e7d32; display:block; margin-bottom:3px; }
+.badge-pricered { background:#fff8e1; color:#f57f17; display:block; margin-top:3px; font-size:8.5px; }
+
+/* AGENTS */
+#agentsSection { margin-top:56px; background:var(--white); border:1px solid var(--border); }
+.agents-section-header { background:var(--dark); padding:12px 24px; font-family:'Montserrat',sans-serif; font-weight:900; font-size:13px; letter-spacing:2.5px; text-transform:uppercase; color:var(--white); border-left:5px solid var(--red); }
+.agents-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(165px,1fr)); }
+.agent-card { padding:22px 14px 18px; text-align:center; border-right:1px solid var(--border); border-bottom:1px solid var(--border); transition:background .15s; }
+.agent-card:hover { background:var(--off-white); }
+.agent-photo { width:70px; height:70px; border-radius:50%; object-fit:cover; margin:0 auto 10px; display:block; background:var(--light); border:2px solid var(--border); }
+.agent-photo-ph { width:70px; height:70px; border-radius:50%; background:var(--light); border:2px solid var(--border); margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:24px; color:#ccc; }
+.agent-name { font-family:'Montserrat',sans-serif; font-weight:800; font-size:12px; color:var(--black); margin-bottom:2px; }
+.agent-title { font-size:10px; color:var(--muted); line-height:1.4; margin-bottom:8px; }
+.agent-phone { font-family:'Montserrat',sans-serif; font-weight:700; font-size:11px; color:var(--red); margin-bottom:2px; }
+.agent-email { font-size:10px; color:var(--muted); word-break:break-all; }
+
+/* FOOTER */
+footer { background:var(--dark); padding:32px; border-top:3px solid var(--red); }
+.footer-inner { max-width:1280px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+.footer-brand { display:flex; align-items:center; gap:10px; }
+.footer-brand-name { font-family:'Montserrat',sans-serif; font-weight:800; font-size:12px; color:rgba(255,255,255,.7); letter-spacing:1px; }
+.footer-brand-sub { font-size:11px; color:rgba(255,255,255,.3); }
+.footer-links { display:flex; gap:20px; flex-wrap:wrap; }
+.footer-link { font-family:'Montserrat',sans-serif; font-weight:600; font-size:11px; color:rgba(255,255,255,.35); text-decoration:none; letter-spacing:.5px; transition:color .15s; }
+.footer-link:hover { color:var(--red); }
+.footer-copy { font-size:11px; color:rgba(255,255,255,.2); }
+
+@media print { #loadingOverlay,#topNav,#catTabs{display:none!important} body{background:white} .cat-section{page-break-inside:avoid} #agentsSection{page-break-before:always} .listings-table-wrap{overflow:visible} }
+@media (max-width:700px) { .nav-inner,.cover-inner,#mainContent,.cat-tabs-inner,.footer-inner{padding-left:16px;padding-right:16px} .cover-stats{display:none} .td-size,.td-comments{display:none} .nav-link{display:none} }
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay">
+  <div class="loader-bars"><div class="loader-bar"></div><div class="loader-bar"></div><div class="loader-bar"></div><div class="loader-bar"></div><div class="loader-bar"></div></div>
+  <div class="loader-title">RLP Commercial</div>
+  <div class="loader-sub">Loading current listings…</div>
+</div>
+
+<nav id="topNav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="https://royallepagesolutions.com/commercial/">
+      <div class="logo-bars"><div class="logo-bar"></div><div class="logo-bar"></div><div class="logo-bar"></div><div class="logo-bar"></div><div class="logo-bar"></div></div>
+      <div><div class="logo-rlp">Royal LePage®</div><div class="logo-name">Solutions</div><div class="logo-div">Commercial Division</div></div>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="https://royallepagesolutions.com/">Home</a>
+      <a class="nav-link" href="https://royallepagesolutions.com/commercial-agents/">Agents</a>
+      <a class="nav-link" href="https://royallepagesolutions.com/contact/">Contact</a>
+      <a class="nav-phone" href="tel:+14032525900">+1 (403) 252-5900</a>
+    </div>
+  </div>
+</nav>
+
+<div id="coverHeader">
+  <div class="cover-red-stripe"></div>
+  <div class="cover-inner">
+    <div>
+      <div class="cover-eyebrow">Royal LePage® Solutions — Commercial Division</div>
+      <div class="cover-title">Commercial Listings</div>
+      <div class="cover-month" id="coverMonth">Loading…</div>
+      <div class="cover-url">www.royallepagesolutions.com/commercial</div>
+    </div>
+    <div class="cover-stats">
+      <div class="cover-stat"><div class="cover-stat-num" id="statListings">—</div><div class="cover-stat-label">Listings</div></div>
+      <div class="cover-stat"><div class="cover-stat-num" id="statCategories">—</div><div class="cover-stat-label">Categories</div></div>
+      <div class="cover-stat"><div class="cover-stat-num" id="statAgents">—</div><div class="cover-stat-label">Associates</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="catTabs"><div class="cat-tabs-inner" id="catTabsInner"></div></div>
+
+<div id="mainContent">
+  <div id="sectionsWrap"></div>
+  <div id="agentsSection" style="display:none">
+    <div class="agents-section-header">Our Associates</div>
+    <div class="agents-grid" id="agentsGrid"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div style="width:4px;height:32px;background:var(--red);margin-right:8px;"></div>
+      <div><div class="footer-brand-name">Royal LePage® Solutions</div><div class="footer-brand-sub">Commercial Division · Calgary, Alberta</div></div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://royallepagesolutions.com/">royallepagesolutions.com</a>
+      <a class="footer-link" href="https://royallepagesolutions.com/commercial-agents/">Commercial Agents</a>
+      <a class="footer-link" href="mailto:solutionssouth@royallepage.ca">Email Us</a>
+      <a class="footer-link" href="tel:+14032525900">(403) 252-5900</a>
+    </div>
+    <div class="footer-copy">© 2026 Royal LePage Solutions. All Rights Reserved.</div>
+  </div>
+</footer>
+
+<script>
+const CONFIG = { LISTINGS_CSV_URL:'', AGENTS_CSV_URL:'', REPORT_MONTH:'March 2026', USE_SAMPLE_DATA:true };
+
+const SAMPLE_LISTINGS = [
+  {category:'Industrial',address:'#129, 10985 - 38 Street NE',mls:'A2253959',size:'Total: 2,566 sf\nMain: 1,833 sf\nMezz: 733 sf',type:'Sale',price:'$989,000',comments:'2,566 sq. ft. mixed-use bay for sale|Bay mezzanine office rented 1 yr @ $1,500/mo — must assume lease|Front fully fixtured for office or showroom; warehouse in back|Drive-in doors and 22\' ceiling clearance|4 parking spots (2 front, 2 rear)|DC zoning allows flexibility including automotive',agent:'Sam Patel',status:'Active',photo:'',brochure:''},
+  {category:'Industrial',address:'1177, 1185, 1193,\n8800 Venture Ave SE',mls:'2180251',size:'Total: 13,370 sf\nMain: 8,339 sf\nMezz Office: 3,031 sf',type:'Sale',price:'$2,740,200\nTaxes: $48,896 (2025)\nOp Costs: $7.00/sf',comments:'Includes 6,000 SF fenced yard|End unit with gated yard for additional storage|Radiant tube heaters in shop bays with makeup air system|Excellent access to Glenmore Trail and Stoney Trail with direct access to 84th Street',agent:'',status:'Leased',photo:'',brochure:''},
+  {category:'Industrial',address:'2013 20 Ave, Nanton',mls:'A2281087',size:'2,640 sq. ft.',type:'Lease',price:'$2,000/month\ngross lease (+GST)',comments:'Prime Highway 2 frontage in the heart of Nanton|Located directly on 20 Ave (Hwy 2 Northbound)|Layout: 3 private offices + dedicated reception area|Parking: Ample street parking + 1 reserved rear stall',agent:'Cheri Long',status:'Active',photo:'',brochure:''},
+  {category:'Industrial',address:'450254 - 82 St E\nFoothills County',mls:'2213921',size:'8,900 sq. ft.\non 2.45 Acres',type:'Sale',price:'$3,600,000',comments:'Tank Farm in Aldersyde Industrial Park, Rural Foothills County|Formerly bio diesel plant; recently pilot plant for wood waste to diesel|10 permitted storage tanks — 1.7M litre capacity, controlled via Siemens PLC|2.45 Acre site with 7,200 SF industrial building; 1,700 SF mezzanine|Corner site — paved access, high power, fenced, gravelled',agent:'Barry Harvey',status:'Active',photo:'',brochure:''},
+  {category:'Industrial',address:'220 - 40 Ave NE',mls:'',size:'Total: 6,465 sf\nOffice Main: 1,500 sf\nOffice 2nd: 1,200 sf\nWarehouse: 3,765 sf',type:'Sale',price:'$1,900,000',comments:'Great owner/user stand alone building in Greenview|Office build-out over two floors with kitchenette, private offices and reception|Building extensions on both sides, currently used for storage|Includes rear fenced compound; potential to acquire racking and a forklift|Close proximity to McKnight Blvd, Edmonton & Deerfoot Trails',agent:'Julie Stefan',status:'Active',photo:'',brochure:''},
+  {category:'Investment',address:'41070 Cook Road\nMD of Rocky View',mls:'',size:'19,710 sq. ft. total\n7 Bays @ 2,850 sq. ft.\nMain: 2,250 sq. ft.\nMezz: 660 sq. ft. (6 bays)',type:'Sale',price:'$3,500,000',comments:'Energy efficient building — in-floor heating, steel frame structure|22\' clear ceiling; 14\' x 16\' drive in door per bay|Located just off Big Hill Springs Road (Hwy 567), under 10 min to Cochrane|7% RETURN|Guaranteed rent for 24 months|Tour premises with accepted offer',agent:'Julie Stefan',status:'Active',photo:'',brochure:''},
+  {category:'Investment',address:'1903-1907 – 31 Street SW',mls:'',size:'0.24 Acres',type:'Sale',price:'$3,049,000',comments:'Mixed-Use MU-2 zoning, FAR 5.0, H26 — max development 53,925 SQF|Corner lot, 120 ft frontage & 90 ft depth, totaling 10,785 SF|Faces 17th Ave SW — over 21,000 vehicles daily|Recent relocation of utility poles, eliminating demolition costs|Approved Development Permit (DP) with plans for medical/retail building',agent:'Dean Cooper',status:'Active',photo:'',brochure:''},
+  {category:'Land',address:'520 – 8 Street\nClaresholm AB',mls:'A2256899',size:'60 Acres',type:'Sale',price:'$1,500,000',comments:'Municipal District of Willow Creek, Rocky Mountain Foothills, 1 hr south of Calgary on Hwy 2|Canamex Corridor — 6,000 km trade corridor between western Canada, US and Mexico|Thriving town, population 4,127 (2024), farming and ranching country|Active participant in the RNIP Program|Services close to property',agent:'Cheri Long',status:'Active',photo:'',brochure:''},
+  {category:'Land',address:'11333 – 84 Street NE',mls:'A2186620',size:'3.53 Acres',type:'Sale',price:'$2,000,000',comments:'Industrial land in Shepard Industrial Park|Partially fenced|Flat, fully graveled with excellent drainage|Small office trailer at front of yard|Zoned S-Fud|Taxes: $26,390.64 (2024)|Access to Stoney Trail, Glenmore Trail and 114 Ave SE',agent:'Cheri Long',status:'Active',photo:'',brochure:''},
+  {category:'Land',address:'259 Mayland Place NE',mls:'A2136297',size:'0.75 Acres',type:'Sale',price:'$1,090,000',comments:'.75 Acre development site — Build-to-Suit up to 20,000 SF|Access to Barlow Trail, Deerfoot Trail, Memorial Drive and Hwy 1|Minutes from shopping centres and major retailers|Bus stop adjacent; Barlow LRT 3 minutes away|Over $100,000 in site improvements',agent:'Julie Stefan',status:'Sold',photo:'',brochure:''},
+  {category:'Land',address:'5111 12 Highway W\nCoronation',mls:'A2090616',size:'4.7 Acres',type:'Lease',price:'$348,888',comments:'Undeveloped commercial land along Hwy 12 West in the Town of Coronation|Zoned HWY-C with excellent exposure along Hwy 1 & Hwy 872|Approximately 2 hours to Red Deer|Discretionary uses: car wash, hotel/motel, auto repair, restaurant, self-storage',agent:'Cheri Long',status:'Active',photo:'',brochure:''},
+  {category:'Land',address:'Plan 1610352 Blk 1 Lot 3\nRocky View County',mls:'A2185723',size:'50.85 Acres',type:'Sale',price:'$1,271,250',comments:'Lot 3 — 50.85 acre parcel; Lot 2 (50.85 Acres) also available|County of Rocky View, just south of Big Hill Springs Rd west of Airdrie|West facing with great access to both Calgary and Airdrie|Paved road access|Zoned AG, suitable for small hobby farm',agent:'Cheri Long',status:'Active',photo:'',brochure:''},
+  {category:'Retail',address:'246 Nolan Ridge Cr. NW\nUnit 125',mls:'',size:'1,334 sf',type:'Sale',price:'$698,880',comments:'Commercial retail space in the thriving NW community of Nolan Hill|Modern architecture and versatile layout in a prime location|Own or lease this prime real estate in Nolan Ridge',agent:'Grace Yan',status:'Active',photo:'',brochure:''},
+  {category:'Retail',address:'246 Nolan Ridge Cr. NW\nUnit 135',mls:'',size:'1,382 sf',type:'Sale',price:'$733,888',comments:'Commercial retail space in the thriving NW community of Nolan Hill|Modern architecture and versatile layout in a prime location|Own or lease this prime real estate in Nolan Ridge',agent:'Grace Yan',status:'Active',photo:'',brochure:''},
+  {category:'Retail',address:'246 Nolan Ridge Cr. NW\nUnit 140',mls:'',size:'1,643 sf',type:'Sale',price:'$824,888',comments:'Commercial retail space in the thriving NW community of Nolan Hill|Modern architecture and versatile layout in a prime location|Own or lease this prime real estate in Nolan Ridge',agent:'Grace Yan',status:'Active',photo:'',brochure:''},
+  {category:'Business',address:'Korean Fried Chicken\nNW Calgary',mls:'A2209213',size:'1,254 sq. ft.',type:'Sale',price:'$109,900',comments:'Authentic Korean fried chicken restaurant in busy NW Calgary shopping plaza|Seating for 40 guests — dine-in, take-out, delivery|Fully outfitted with essential equipment|Lease to April 2026 with 5-year renewal option|Monthly rent $4,647.37 + GST; utilities not included|Additional info disclosed to serious qualified buyers under NDA',agent:'Taeju Lee',status:'Price Reduction',photo:'',brochure:''},
+  {category:'Business',address:'Cannabis Retail\nNE Calgary',mls:'A2279108',size:'955 sq. ft.',type:'Sale',price:'$149,900',comments:'Fully licensed and operational cannabis retail store — high-traffic NE Calgary|Established March 2022 with loyal customer base and strong community reputation|Turnkey operation suitable for experienced operators and new entrants|Average profit margin approximately 25%|Competitive lease rate $26/sq. ft. plus operating costs',agent:'Taeju Lee',status:'New',photo:'',brochure:''},
+  {category:'Business',address:'Licensed Café\nCanmore, AB',mls:'',size:'',type:'Sale',price:'$195,000',comments:'Commercial leasehold interest and assets of Harvest Café — Canmore, AB|Sought-after downtown frontage with desirable tourist and local foot traffic|Spacious interior and dog-friendly outdoor patio with Rocky Mountain views|Established turnkey business ideal for owner/user in growing Canmore market|Current lease in place to March 31/26|Contact listing realtor to schedule viewing before visiting',agent:'Alex Bauer',status:'Active',photo:'',brochure:'#'},
+];
+
+const SAMPLE_AGENTS = [
+  {name:'Alex Bauer',title:'Associate\nCommercial Division',phone:'403-688-1407',email:'alex@alexsellscanmore.ca',photo:''},
+  {name:'Barry Harvey',title:'Associate\nCommercial Division',phone:'403-807-7839',email:'barrywharvey@yahoo.com',photo:''},
+  {name:'Brian Romanow',title:'Associate\nCommercial Division',phone:'403-710-5628',email:'brianromanow@royallepage.ca',photo:''},
+  {name:'Anthony Ibhahe',title:'Associate Broker\nCommercial Division',phone:'604-939-6666',email:'aibhahe@royallepage.ca',photo:''},
+  {name:'Chad Morgan',title:'Associate Broker / Owner\nCommercial Division',phone:'403-464-6765',email:'chadmorgan@royallepage.ca',photo:''},
+  {name:'Cheri Long',title:'Associate Broker\nCommercial Division',phone:'403-860-9419',email:'clong@royallepagecommercial.com',photo:''},
+  {name:'Dean Cooper',title:'Associate\nCommercial Division',phone:'403-918-8407',email:'sales@mountainliving.ca',photo:''},
+  {name:'Grace Yan',title:'Associate\nCommercial Division',phone:'403-660-6778',email:'grace@topglobalrealestate.com',photo:''},
+  {name:'Julie Stefan',title:'Associate\nCommercial Division',phone:'403-804-1399',email:'jstefan@royallepage.ca',photo:''},
+  {name:'Rohit Brar',title:'Associate\nCommercial Division',phone:'587-578-7259',email:'rohitbrar@royallepage.ca',photo:''},
+  {name:'Sam Patel',title:'Associate\nCommercial Division',phone:'403-975-8233',email:'sampatel@royallepage.ca',photo:''},
+  {name:'Taeju Lee',title:'Associate\nCommercial Division',phone:'587-436-6737',email:'tlee@royallepage.ca',photo:''},
+];
+
+const CAT_ORDER=['Industrial','Investment','Land','Office','Retail','Business'];
+const CAT_LABELS={Industrial:'Industrial For Sale / Lease',Investment:'Investment For Sale',Land:'Land For Sale',Office:'Office For Sale / Lease',Retail:'Retail For Sale / Lease',Business:'Businesses For Sale'};
+
+let allListings=[],allAgents=[];
+
+function csvToRows(text){const rows=[];let row=[],cell='',inQ=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(inQ&&text[i+1]==='"'){cell+='"';i++;}else inQ=!inQ;}else if(c===','&&!inQ){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!inQ){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell);rows.push(row);row=[];cell='';}else cell+=c;}if(cell||row.length){row.push(cell);rows.push(row);}return rows;}
+
+async function loadData(){
+  if(CONFIG.USE_SAMPLE_DATA||!CONFIG.LISTINGS_CSV_URL){allListings=SAMPLE_LISTINGS;allAgents=SAMPLE_AGENTS;return;}
+  try{
+    const r1=await fetch(CONFIG.LISTINGS_CSV_URL);
+    const rows=csvToRows(await r1.text()).slice(1).filter(r=>r[0]);
+    allListings=rows.map(r=>({category:r[0]||'',address:r[1]||'',mls:r[2]||'',size:r[3]||'',type:r[4]||'Sale',price:r[5]||'',comments:r[6]||'',agent:r[7]||'',status:r[8]||'Active',photo:r[9]||'',brochure:r[10]||''}));
+    if(CONFIG.AGENTS_CSV_URL){const r2=await fetch(CONFIG.AGENTS_CSV_URL);const ar=csvToRows(await r2.text()).slice(1).filter(r=>r[0]);allAgents=ar.map(r=>({name:r[0]||'',title:r[1]||'',phone:r[2]||'',email:r[3]||'',photo:r[4]||''}));}
+  }catch(e){allListings=SAMPLE_LISTINGS;allAgents=SAMPLE_AGENTS;}
+}
+
+function badgeHtml(status,type){
+  const s=(status||'').toLowerCase(),t=(type||'').toLowerCase();
+  if(s==='sold')return`<span class="badge badge-sold">Sold</span>`;
+  if(s==='leased')return`<span class="badge badge-leased">Leased</span><br><small style="font-size:10px;color:var(--muted)">Remains for Sale</small>`;
+  if(s==='new')return`<span class="badge badge-new">New</span><span class="badge badge-${t==='lease'?'lease':'sale'}">${t==='lease'?'Lease':'Sale'}</span>`;
+  if(s==='price reduction')return`<span class="badge badge-${t==='lease'?'lease':'sale'}">${t==='lease'?'Lease':'Sale'}</span><span class="badge badge-pricered">Price Reduction</span>`;
+  return t==='lease'?`<span class="badge badge-lease">Lease</span>`:`<span class="badge badge-sale">Sale</span>`;
+}
+
+function renderRow(l){
+  const bullets=(l.comments||'').split('|').filter(Boolean).map(c=>`<li>${c.trim()}</li>`).join('');
+  return`<tr>
+    <td class="td-photo">
+      ${l.photo?`<img class="listing-photo" src="${l.photo}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:``}
+      <div class="listing-photo-ph" style="${l.photo?'display:none':''}">🏢</div>
+    </td>
+    <td class="td-property">
+      <div class="prop-address">${(l.address||'').replace(/\n/g,'<br>')}</div>
+      ${l.mls?`<div class="prop-mls">MLS# ${l.mls}</div>`:''}
+      ${l.brochure?`<a class="prop-brochure" href="${l.brochure}" target="_blank">⬇ Brochure</a>`:''}
+    </td>
+    <td class="td-size">${(l.size||'—')}</td>
+    <td class="td-type">${badgeHtml(l.status,l.type)}</td>
+    <td class="td-price"><div class="price-main">${(l.price||'').replace(/\n/g,'<br>')}</div></td>
+    <td class="td-comments"><ul class="comments-list">${bullets}</ul></td>
+    <td class="td-contact"><div class="contact-name">${l.agent||'—'}</div></td>
+  </tr>`;
+}
+
+function renderSection(cat,listings){
+  const label=CAT_LABELS[cat]||cat;
+  const tabs=CAT_ORDER.map(c=>`<a class="cat-section-tab${c===cat?' this-cat':''}" href="#section-${c}">${c}</a>`).join('');
+  return`<div class="cat-section" id="section-${cat}">
+    <div class="cat-section-header">
+      <div class="cat-section-title">${label}</div>
+      <div class="cat-section-tabs">${tabs}</div>
+    </div>
+    <div class="listings-table-wrap">
+      <table class="lt">
+        <thead><tr>
+          <th style="width:90px"></th>
+          <th>Property</th>
+          <th style="width:120px">Size</th>
+          <th style="width:90px">Sale / Lease</th>
+          <th style="width:130px">Asking Price</th>
+          <th>Comments</th>
+          <th style="width:95px">Contact</th>
+        </tr></thead>
+        <tbody>${listings.map(renderRow).join('')}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function render(){
+  const month=CONFIG.REPORT_MONTH||'Monthly Report';
+  const activeCats=CAT_ORDER.filter(c=>allListings.some(l=>l.category===c));
+  document.getElementById('coverMonth').textContent=month;
+  document.getElementById('statListings').textContent=allListings.length;
+  document.getElementById('statCategories').textContent=activeCats.length;
+  document.getElementById('statAgents').textContent=allAgents.length||[...new Set(allListings.map(l=>l.agent).filter(Boolean))].length;
+  document.getElementById('catTabsInner').innerHTML=
+    activeCats.map(c=>`<a class="cat-tab-btn" href="#section-${c}">${c}</a>`).join('')+
+    `<a class="cat-tab-btn" href="#agentsSection">Our Associates</a>`;
+  document.getElementById('sectionsWrap').innerHTML=
+    activeCats.map(cat=>renderSection(cat,allListings.filter(l=>l.category===cat))).join('');
+  const agents=allAgents.length?allAgents:[...new Set(allListings.map(l=>l.agent).filter(Boolean))].sort().map(n=>({name:n,title:'Associate\nCommercial Division',phone:'',email:'',photo:''}));
+  document.getElementById('agentsGrid').innerHTML=agents.map(a=>`
+    <div class="agent-card">
+      ${a.photo?`<img class="agent-photo" src="${a.photo}" alt="${a.name}" onerror="this.style.display='none'">`:`<div class="agent-photo-ph">👤</div>`}
+      <div class="agent-name">${a.name}</div>
+      <div class="agent-title">${(a.title||'').replace(/\n/g,'<br>')}</div>
+      <div class="agent-phone">${a.phone}</div>
+      <div class="agent-email">${a.email}</div>
+    </div>`).join('');
+  document.getElementById('agentsSection').style.display='block';
+  const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id.replace('section-','');document.querySelectorAll('.cat-tab-btn').forEach(t=>t.classList.toggle('active',t.getAttribute('href')==='#section-'+id));}});},{rootMargin:'-20% 0px -70% 0px'});
+  activeCats.forEach(c=>{const el=document.getElementById('section-'+c);if(el)obs.observe(el);});
+}
+
+async function init(){
+  await loadData();render();
+  const ol=document.getElementById('loadingOverlay');
+  ol.classList.add('hidden');setTimeout(()=>ol.style.display='none',500);
+}
+init();
+</script>
+</body>
+</html>
