@@ -192,10 +192,34 @@ body {
 
 /* ── PRINT STYLES ── */
 @media print {
+  @page {
+    size: 8.5in 11in landscape;
+    margin: 0.4in 0.4in 0.4in 0.4in;
+  }
   #controls { display:none !important; }
   body { padding:0; background:#fff; margin:0; }
-  .pdf-page { width:100%; margin:0; box-shadow:none; page-break-after:always; }
-  .pdf-page:last-child { page-break-after:auto; }
+  .pdf-page {
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+    page-break-inside: avoid;
+    overflow: visible;
+  }
+  .pdf-page:last-child { page-break-after: auto; }
+  .cover-page { min-height: 9.2in; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .section-page { overflow: visible; }
+  .listing-table { font-size: 10px; }
+  .listing-table td { padding: 7px 8px; }
+  .listing-table thead th { padding: 7px 8px; }
+  .section-title-red { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .section-tabs { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .listing-table thead tr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .agent-footer-page { -webkit-print-color-adjust: exact; print-color-adjust: exact; min-height: 9.2in; }
+  .roster-page { overflow: visible; }
+  .roster-grid { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .needs-table thead tr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 </style>
 </head>
@@ -209,6 +233,8 @@ body {
   </select>
   <button class="ctrl-btn btn-red" onclick="window.print()">⬇ Download PDF</button>
   <div class="ctrl-divider"></div>
+  <span style="font-size:11px;color:rgba(255,255,255,.4);font-family:'Montserrat',sans-serif;">Print settings: <strong style="color:rgba(255,255,255,.7);">Landscape · 8.5×11 · No margins</strong></span>
+  <div class="ctrl-divider"></div>
   <button class="ctrl-btn btn-outline" onclick="window.close()">← Back to Website</button>
   <span id="statusMsg">Loading data…</span>
 </div>
@@ -218,9 +244,9 @@ body {
 </div>
 
 <script>
-const LISTINGS_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTgwj6rlPJPRaH4mBbvZ0_4w4QYGYd0rAxFxUIuSvA8ikqzrtQk0D4dSrnJBZ4qLgdOGnO_kx-PMsMU/pub?gid=1577407810&single=true&output=csv';
-const AGENTS_CSV   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTgwj6rlPJPRaH4mBbvZ0_4w4QYGYd0rAxFxUIuSvA8ikqzrtQk0D4dSrnJBZ4qLgdOGnO_kx-PMsMU/pub?gid=1051570264&single=true&output=csv';
-const NEEDS_CSV    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTgwj6rlPJPRaH4mBbvZ0_4w4QYGYd0rAxFxUIuSvA8ikqzrtQk0D4dSrnJBZ4qLgdOGnO_kx-PMsMU/pub?gid=936615927&single=true&output=csv';
+const LISTINGS_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTToAC7Jf5XxoV-vZe6K7jgMudt_3vJClps8j6qDW4wyET3Wj-BQRUwQqNpBA4rW1hjn7hNfbfh_Y9I/pub?gid=118750696&single=true&output=csv';
+const AGENTS_CSV   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTToAC7Jf5XxoV-vZe6K7jgMudt_3vJClps8j6qDW4wyET3Wj-BQRUwQqNpBA4rW1hjn7hNfbfh_Y9I/pub?gid=237844589&single=true&output=csv';
+const NEEDS_CSV    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTToAC7Jf5XxoV-vZe6K7jgMudt_3vJClps8j6qDW4wyET3Wj-BQRUwQqNpBA4rW1hjn7hNfbfh_Y9I/pub?gid=1815568429&single=true&output=csv';
 const REPORT_MONTH = 'March 2026';
 
 const CAT_ORDER  = ['Industrial','Investment','Land','Office','Retail','Business'];
@@ -280,8 +306,8 @@ async function loadData(){
     const rows=csvToRows(await r1.text()).slice(1).filter(r=>r[0]);
     allListings=rows.map(r=>({category:r[0]||'',address:r[1]||'',mls:r[2]||'',size:r[3]||'',type:r[4]||'Sale',price:r[5]||'',comments:r[6]||'',agent:r[7]||'',status:r[8]||'Active',photo:r[9]||'',brochure:r[10]||'',agent2:r[11]||''}));
     const r2=await fetch(AGENTS_CSV);
-    const ar=csvToRows(await r2.text()).slice(1).filter(r=>r[0]);
-    allAgents=ar.map(r=>({name:r[0]||'',title:r[1]||'',phone:r[2]||'',email:r[3]||'',photo:r[4]||'',website:r[5]||''}));
+    const ar=csvToRows(await r2.text()).slice(2).filter(r=>r[0]&&r[0]!=='Agent Name');
+    allAgents=ar.map(r=>({name:r[0]||'',title:r[1]||'',phone:r[2]||'',email:r[3]||'',photo:r[4]||'',website:r[5]||''})).sort((a,b)=>a.name.localeCompare(b.name));
     if(NEEDS_CSV){const r3=await fetch(NEEDS_CSV);const nr=csvToRows(await r3.text()).slice(1).filter(r=>r[0]);allNeeds=nr.map(r=>({category:r[0]||'',description:r[1]||'',budget:r[2]||'',location:r[3]||'',size:r[4]||'',agent:r[5]||'',date:r[6]||''}));}
     else allNeeds=SAMPLE_NEEDS;
     document.getElementById('statusMsg').textContent='Loaded '+allListings.length+' listings ✓';
@@ -342,7 +368,7 @@ function renderCoverPage(agentName){
     <div class="cover-left-bar"></div>
     <div class="cover-top-bar"></div>
     <div class="cover-logo-wrap">
-      <img src="https://drive.google.com/uc?export=view&id=1zzCtg0qk4p2cLYN__jriV_f_2QVMxCy3" alt="Royal LePage Commercial" style="height:80px;width:auto;display:block;margin:0 auto 24px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <img src="https://kyleduiker.github.io/commercial-listings/media/2024%20RLP%20Commercial%20Logos_White-Red%20-%20Brokerage%20.png" alt="Royal LePage Commercial" style="height:80px;width:auto;display:block;margin:0 auto 24px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
       <div style="display:none">
         <div class="cover-logo-bars">
           <div class="cover-logo-bar"></div><div class="cover-logo-bar"></div>
