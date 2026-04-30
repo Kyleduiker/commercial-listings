@@ -269,8 +269,8 @@ async function load(){
     listings=csv(await r1.text()).slice(1).filter(r=>r[0]&&r[0]!=='Category').map(r=>({
       cat:r[0]||'', addr:r[1]||'', mls:r[2]||'', size:r[3]||'',
       type:r[4]||'Sale', price:r[5]||'', comments:r[6]||'',
-      agent:r[7]||'', status:r[8]||'Active', photo:r[9]||'',
-      brochure:r[10]||'', agent2:r[11]||''
+      agent:r[7]||'', agent2:r[8]||'', status:r[9]||'Active', photo:r[10]||'',
+      brochure:r[11]||''
     }));
     const r2=await fetch(AGENTS_CSV);
     agents=csv(await r2.text()).slice(2).filter(r=>r[0]&&r[0]!=='Agent Name').map(r=>({
@@ -313,7 +313,7 @@ function lrow(l){
     <div class="lc-ty">${bdg(l.status,l.type)}</div>
     <div class="lc-px"><div class="l-pv">${(l.price||'—').replace(/\n/g,'<br>')}</div></div>
     <div class="lc-cm">${buls}</div>
-    <div class="lc-ct"><div class="l-cn">${l.agent||'—'}</div>${l.agent2?`<div class="l-cn2">${l.agent2}</div>`:''}</div>
+    <div class="lc-ct"><div class="l-cn">${l.agent||'—'}${l.agent2?` <span style="color:#aaa;font-weight:600;">/ ${l.agent2}</span>`:''}</div></div>
   </div>`;
 }
 
