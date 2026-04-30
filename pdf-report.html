@@ -27,7 +27,8 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
 
 /* ─── PDF PAGE ──────────────────────────────────────── */
 .page {
-  width:10.5in; /* slightly narrower than 11in landscape for margins */
+  width:10.5in;
+  min-height:7.6in;
   background:#fff;
   margin:12px auto;
   box-shadow:0 4px 20px rgba(0,0,0,.3);
@@ -55,7 +56,7 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
   background:repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(234,0,42,.04) 60px,rgba(234,0,42,.04) 61px);
   pointer-events:none;
 }
-.c-lbar { position:absolute; top:0; left:0; width:8px; height:100%; background:#EA002A; }
+
 .c-tbar { position:absolute; top:0; left:0; right:0; height:3px; background:#EA002A; }
 .c-logo { height:72px; width:auto; display:block; margin:0 auto 40px; position:relative; z-index:1; }
 .c-title { font-family:'Montserrat',sans-serif; font-weight:900; font-size:50px; color:#EA002A; text-transform:uppercase; letter-spacing:-1px; line-height:1; margin-bottom:14px; position:relative; z-index:1; }
@@ -66,9 +67,8 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
 /* ─── TOC ───────────────────────────────────────────── */
 .toc { padding:44px 40px; }
 .toc-title { font-family:'Montserrat',sans-serif; font-weight:900; font-size:24px; letter-spacing:4px; text-transform:uppercase; color:#111; border-bottom:3px solid #EA002A; padding-bottom:12px; margin-bottom:28px; }
-.toc-row { display:flex; align-items:center; justify-content:space-between; padding:13px 18px; background:#f7f7f7; border-left:4px solid #EA002A; margin-bottom:2px; }
-.toc-name { font-family:'Montserrat',sans-serif; font-weight:700; font-size:11.5px; color:#111; text-transform:uppercase; letter-spacing:1px; }
-.toc-num  { font-family:'Montserrat',sans-serif; font-weight:900; font-size:20px; color:#EA002A; }
+.toc-row { padding:14px 20px; background:#f7f7f7; border-left:4px solid #EA002A; margin-bottom:2px; }
+.toc-name { font-family:'Montserrat',sans-serif; font-weight:700; font-size:12px; color:#111; text-transform:uppercase; letter-spacing:1px; }
 
 /* ─── SECTION HEADER ────────────────────────────────── */
 .sec-hdr { display:flex; align-items:stretch; }
@@ -188,14 +188,32 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
 
 /* ─── PRINT ──────────────────────────────────────────── */
 @media print {
-  @page { size:11in 8.5in; margin:0.3in; }
+  @page {
+    size: landscape;
+    margin: 0.3in 0.3in 0.3in 0.3in;
+  }
   #controls { display:none !important; }
-  body { padding:0; background:#fff; margin:0; }
-  .page { width:100%; margin:0; box-shadow:none; page-break-after:always; overflow:visible; }
-  .page:last-child { page-break-after:auto; }
-  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
-  .listing-row { page-break-inside:avoid; }
-  .needs-row   { page-break-inside:avoid; }
+  html, body { padding:0; margin:0; background:#fff; }
+  .page {
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+    overflow: visible;
+    box-sizing: border-box;
+  }
+  .page:last-child { page-break-after: auto; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .listing-row { page-break-inside: avoid; }
+  .needs-row   { page-break-inside: avoid; }
+  /* Force all flex rows to stay inline */
+  .listing-row { display: flex !important; flex-wrap: nowrap !important; }
+  .lc-photo, .lc-prop, .lc-size, .lc-type, .lc-price, .lc-comments, .lc-contact {
+    flex-shrink: 0 !important;
+    overflow: visible !important;
+  }
+  .lc-comments { flex: 1 !important; }
 }
 </style>
 </head>
@@ -308,7 +326,7 @@ function tabs(active){
 function cover(agentName){
   const ia=agentName&&agentName!=='all';
   return`<div class="page cover">
-    <div class="c-lbar"></div><div class="c-tbar"></div>
+    <div class="c-tbar"></div>
     <img class="c-logo" src="${LOGO}" alt="" onerror="this.style.display='none'">
     <div class="c-title">Commercial Listings</div>
     <div class="c-month">${MONTH}</div>
@@ -321,7 +339,7 @@ function toc(ls){
   const ac=CATS.filter(c=>ls.some(l=>l.cat===c));
   return`<div class="page toc">
     <div class="toc-title">Table of Contents</div>
-    ${ac.map(c=>`<div class="toc-row"><span class="toc-name">${CLBL[c]}</span><span class="toc-num">${ls.filter(l=>l.cat===c).length}</span></div>`).join('')}
+    ${ac.map(c=>`<div class="toc-row"><span class="toc-name">${CLBL[c]}</span></div>`).join('')}
   </div>`;
 }
 
