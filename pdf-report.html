@@ -28,21 +28,19 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
 /* ─── PDF PAGE ──────────────────────────────────────── */
 .page {
   width:10.4in;
-  height:7.8in;
   background:#fff;
   margin:12px auto;
   box-shadow:0 4px 20px rgba(0,0,0,.3);
-  page-break-after:always;
   overflow:hidden;
   position:relative;
   box-sizing:border-box;
 }
-.page:last-child { page-break-after:auto; }
 
 /* ─── COVER ─────────────────────────────────────────── */
 .cover {
   background:#111;
-  height:100%;
+  min-height:7.8in;
+  page-break-after:always;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -67,12 +65,13 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
 .c-url { font-size:11px; color:rgba(255,255,255,.22); letter-spacing:1px; margin-top:28px; position:relative; z-index:1; }
 
 /* ─── TOC ───────────────────────────────────────────── */
-.toc { padding:44px 40px; }
+.toc { padding:44px 40px; min-height:4in; page-break-after:always; }
 .toc-title { font-family:'Montserrat',sans-serif; font-weight:900; font-size:24px; letter-spacing:4px; text-transform:uppercase; color:#111; border-bottom:3px solid #EA002A; padding-bottom:12px; margin-bottom:28px; }
 .toc-row { padding:14px 20px; background:#f7f7f7; border-left:4px solid #EA002A; margin-bottom:2px; }
 .toc-name { font-family:'Montserrat',sans-serif; font-weight:700; font-size:12px; color:#111; text-transform:uppercase; letter-spacing:1px; }
 
 /* ─── SECTION HEADER ────────────────────────────────── */
+.sec-block { break-inside:avoid-page; }
 .sec-hdr { display:flex; align-items:stretch; }
 .sec-red { background:#EA002A; padding:10px 20px; font-family:'Montserrat',sans-serif; font-weight:900; font-size:11.5px; letter-spacing:2.5px; text-transform:uppercase; color:#fff; white-space:nowrap; display:flex; align-items:center; }
 .sec-tabs { background:#2e2e2e; flex:1; display:flex; align-items:center; overflow:hidden; }
@@ -152,7 +151,7 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
 .n-cat-bdg { display:inline-block; padding:2px 6px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:8px; letter-spacing:.8px; text-transform:uppercase; border-radius:2px; background:rgba(234,0,42,.08); color:#EA002A; }
 
 /* ─── ROSTER ─────────────────────────────────────────── */
-.roster { padding:32px; }
+.roster { padding:32px; page-break-before:always; }
 .roster-hdr { font-family:'Montserrat',sans-serif; font-weight:900; font-size:18px; letter-spacing:4px; text-transform:uppercase; color:#fff; background:#EA002A; padding:10px 20px; display:inline-block; margin-bottom:18px; }
 .roster-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:#ddd; border:1px solid #ddd; }
 .r-card { background:#fff; padding:14px 10px; text-align:center; }
@@ -202,11 +201,13 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
     min-height: 0;
     margin: 0;
     box-shadow: none;
-    page-break-after: always;
     overflow: visible;
     box-sizing: border-box;
   }
-  .page:last-child { page-break-after: auto; }
+  .cover, .toc, .roster, .af-page { page-break-after: always; }
+  .sec-block { page-break-inside: avoid; }
+  .listing-row { page-break-inside: avoid; }
+  .needs-row { page-break-inside: avoid; }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .listing-row { page-break-inside: avoid; }
   .needs-row   { page-break-inside: avoid; }
@@ -351,7 +352,7 @@ function toc(ls){
 }
 
 function section(cat,ls){
-  return`<div class="page">
+  return`<div class="sec-block">
     <div class="sec-hdr">
       <div class="sec-red">${CLBL[cat]||cat}</div>
       <div class="sec-tabs">${tabs(cat)}</div>
@@ -371,7 +372,7 @@ function section(cat,ls){
 
 function needsPage(ns){
   if(!ns.length)return'';
-  return`<div class="page">
+  return`<div class="sec-block">
     <div class="sec-hdr">
       <div class="sec-red">Needs &amp; Wants</div>
       <div class="sec-tabs"><div class="sec-tab">Buyer Requirements — Contact Agent If You Have A Match</div></div>
@@ -438,8 +439,11 @@ function build(){
   const ao=ia?(agents.find(a=>a.name===curAgent)||{name:curAgent,title:'Associate\nCommercial Division',phone:'',email:'',photo:'',website:''}):null;
   let html=cover(curAgent);
   if(!ia)html+=toc(ls);
-  ac.forEach(cat=>html+=section(cat,ls.filter(l=>l.cat===cat)));
-  if(!ia&&needs.length)html+=needsPage(needs);
+  // Wrap all sections in one flowing page
+  let sectionsHtml='';
+  ac.forEach(cat=>sectionsHtml+=section(cat,ls.filter(l=>l.cat===cat)));
+  if(!ia&&needs.length)sectionsHtml+=needsPage(needs);
+  html+=`<div class="page">${sectionsHtml}</div>`;
   if(!ia&&agents.length)html+=roster(agents);
   if(ia&&ao)html+=agentFooter(ao);
   document.getElementById('pages').innerHTML=html;
