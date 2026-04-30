@@ -3,44 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <title>RLP Commercial — PDF Report</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* ─── SCREEN CONTROLS ─────────────────────────────── */
+/* ── CONTROLS ── */
 #controls {
   position:fixed; top:0; left:0; right:0; z-index:9999;
   background:#111; border-bottom:2px solid #EA002A;
   padding:10px 24px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
 }
-.cl { font-family:'Montserrat',sans-serif; font-weight:700; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.5); }
+.cl { font-family:'Montserrat',sans-serif; font-weight:700; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.5); }
 #agentSelect { background:#222; border:1px solid #333; color:#fff; padding:7px 12px; border-radius:3px; font-size:12px; font-family:'Montserrat',sans-serif; font-weight:600; cursor:pointer; min-width:220px; }
-.cb { padding:7px 18px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; border:none; border-radius:3px; cursor:pointer; }
+.cb { padding:7px 16px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; border:none; border-radius:3px; cursor:pointer; transition:all .2s; }
 .cb-r { background:#EA002A; color:#fff; }
+.cb-r:hover { background:#c8001f; }
+.cb-b { background:#1a3a5c; color:#fff; }
+.cb-b:hover { background:#0f2640; }
 .cb-g { background:transparent; color:#888; border:1px solid #333; }
 .cb-g:hover { border-color:#EA002A; color:#fff; }
 .cdv { width:1px; height:24px; background:#333; }
-#sm { font-size:11px; color:#666; font-family:'Montserrat',sans-serif; }
-.hint { font-size:10px; color:rgba(255,255,255,.3); font-family:'Montserrat',sans-serif; }
-.hint strong { color:rgba(255,255,255,.6); }
+#sm { font-size:10px; color:#666; font-family:'Montserrat',sans-serif; }
+.hint { font-size:10px; color:rgba(255,255,255,.25); font-family:'Montserrat',sans-serif; }
+.hint strong { color:rgba(255,255,255,.5); }
 
-/* ─── PAGE BODY ─────────────────────────────────────── */
-body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans-serif; -webkit-font-smoothing:antialiased; }
+/* ── BODY ── */
+body { margin:0; padding:68px 0 40px; background:#ccc; font-family:'Open Sans',sans-serif; -webkit-font-smoothing:antialiased; }
 
-/* ─── PDF PAGE ──────────────────────────────────────── */
-.page {
+/* ── REPORT WRAPPER - shown on screen ── */
+#report {
   width:10.4in;
+  margin:0 auto;
   background:#fff;
-  margin:12px auto;
-  box-shadow:0 4px 20px rgba(0,0,0,.3);
-  overflow:hidden;
-  position:relative;
-  box-sizing:border-box;
+  box-shadow:0 4px 24px rgba(0,0,0,.3);
 }
 
-/* ─── COVER ─────────────────────────────────────────── */
+/* ══════════════════════
+   COVER
+══════════════════════ */
 .cover {
+  width:100%;
+  height:7.8in;
   background:#111;
-  min-height:7.8in;
-  page-break-after:always;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -48,179 +51,167 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
   text-align:center;
   padding:48px;
   position:relative;
+  overflow:hidden;
   box-sizing:border-box;
 }
 .cover::before {
-  content:'';
-  position:absolute; inset:0;
+  content:''; position:absolute; inset:0; pointer-events:none;
   background:repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(234,0,42,.04) 60px,rgba(234,0,42,.04) 61px);
-  pointer-events:none;
 }
+.cover-tbar { position:absolute; top:0; left:0; right:0; height:4px; background:#EA002A; }
+.cover-bbar { position:absolute; bottom:0; left:0; right:0; height:4px; background:#EA002A; }
+.cover-logo { height:70px; width:auto; display:block; margin:0 auto 36px; position:relative; z-index:1; }
+.cover-title { font-family:'Montserrat',sans-serif; font-weight:900; font-size:52px; color:#EA002A; text-transform:uppercase; letter-spacing:-1px; line-height:1; margin-bottom:14px; position:relative; z-index:1; }
+.cover-month { font-family:'Montserrat',sans-serif; font-weight:700; font-size:18px; color:#fff; letter-spacing:4px; text-transform:uppercase; position:relative; z-index:1; }
+.cover-agent { font-family:'Montserrat',sans-serif; font-weight:800; font-size:14px; color:#C8A84B; letter-spacing:3px; text-transform:uppercase; margin-top:10px; position:relative; z-index:1; }
+.cover-url { font-size:11px; color:rgba(255,255,255,.2); letter-spacing:1px; margin-top:28px; position:relative; z-index:1; }
 
-.c-tbar { position:absolute; top:0; left:0; right:0; height:3px; background:#EA002A; }
-.c-logo { height:72px; width:auto; display:block; margin:0 auto 40px; position:relative; z-index:1; }
-.c-title { font-family:'Montserrat',sans-serif; font-weight:900; font-size:50px; color:#EA002A; text-transform:uppercase; letter-spacing:-1px; line-height:1; margin-bottom:14px; position:relative; z-index:1; }
-.c-month { font-family:'Montserrat',sans-serif; font-weight:700; font-size:17px; color:#fff; letter-spacing:4px; text-transform:uppercase; position:relative; z-index:1; }
-.c-agent { font-family:'Montserrat',sans-serif; font-weight:800; font-size:13px; color:#C8A84B; letter-spacing:3px; text-transform:uppercase; margin-top:10px; position:relative; z-index:1; }
-.c-url { font-size:11px; color:rgba(255,255,255,.22); letter-spacing:1px; margin-top:28px; position:relative; z-index:1; }
-
-/* ─── TOC ───────────────────────────────────────────── */
-.toc { padding:44px 40px; min-height:4in; page-break-after:always; }
-.toc-title { font-family:'Montserrat',sans-serif; font-weight:900; font-size:24px; letter-spacing:4px; text-transform:uppercase; color:#111; border-bottom:3px solid #EA002A; padding-bottom:12px; margin-bottom:28px; }
+/* ══════════════════════
+   TOC
+══════════════════════ */
+.toc {
+  width:100%; padding:48px 44px;
+  box-sizing:border-box;
+  border-bottom:1px solid #e8e8e8;
+}
+.toc-title { font-family:'Montserrat',sans-serif; font-weight:900; font-size:24px; letter-spacing:4px; text-transform:uppercase; color:#111; border-bottom:3px solid #EA002A; padding-bottom:12px; margin-bottom:24px; }
 .toc-row { padding:14px 20px; background:#f7f7f7; border-left:4px solid #EA002A; margin-bottom:2px; }
 .toc-name { font-family:'Montserrat',sans-serif; font-weight:700; font-size:12px; color:#111; text-transform:uppercase; letter-spacing:1px; }
 
-/* ─── SECTION HEADER ────────────────────────────────── */
-.sec-block { break-inside:avoid-page; }
-.sec-hdr { display:flex; align-items:stretch; }
-.sec-red { background:#EA002A; padding:10px 20px; font-family:'Montserrat',sans-serif; font-weight:900; font-size:11.5px; letter-spacing:2.5px; text-transform:uppercase; color:#fff; white-space:nowrap; display:flex; align-items:center; }
-.sec-tabs { background:#2e2e2e; flex:1; display:flex; align-items:center; overflow:hidden; }
-.sec-tab { font-family:'Montserrat',sans-serif; font-weight:700; font-size:8.5px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.38); padding:10px 12px; white-space:nowrap; }
-.sec-tab.on { color:#fff; background:rgba(255,255,255,.1); }
+/* ══════════════════════
+   LISTINGS FLOW
+══════════════════════ */
+.listings-flow { width:100%; }
 
-/* ─── COLUMN HEADER ROW ─────────────────────────────── */
-.col-hdr {
-  display:flex;
-  background:#2e2e2e;
-  border-bottom:1px solid rgba(255,255,255,.06);
-}
-.col-hdr div {
-  font-family:'Montserrat',sans-serif; font-weight:700;
-  font-size:8.5px; letter-spacing:1.5px; text-transform:uppercase;
-  color:rgba(255,255,255,.6); padding:8px 9px;
-  border-right:1px solid rgba(255,255,255,.06);
-}
-.col-hdr div:last-child { border-right:none; }
+/* Category header */
+.cat-header { display:flex; align-items:stretch; }
+.cat-red { background:#EA002A; padding:10px 20px; font-family:'Montserrat',sans-serif; font-weight:900; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:#fff; white-space:nowrap; display:flex; align-items:center; }
+.cat-tabs { background:#2e2e2e; flex:1; display:flex; align-items:center; overflow:hidden; }
+.cat-tab { font-family:'Montserrat',sans-serif; font-weight:700; font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.35); padding:10px 11px; white-space:nowrap; }
+.cat-tab.on { color:#fff; background:rgba(255,255,255,.1); }
 
-/* ─── LISTING ROW (div-based, print-stable) ─────────── */
-.listing-row {
-  display:flex;
-  border-bottom:1px solid #e5e5e5;
-  align-items:stretch;
-  background:#fff;
-}
-.listing-row:nth-child(even) { background:#fafafa; }
-.listing-row:last-child { border-bottom:none; }
+/* Column header */
+.col-hdr { display:flex; background:#2e2e2e; }
+.col-hdr > div { font-family:'Montserrat',sans-serif; font-weight:700; font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:7px 9px; border-right:1px solid rgba(255,255,255,.06); box-sizing:border-box; }
+.col-hdr > div:last-child { border-right:none; }
 
-/* cell sizing — must match col-hdr */
-.lc-photo   { width:76px;  min-width:76px;  padding:9px; flex-shrink:0; border-right:1px solid #ebebeb; }
-.lc-prop    { width:148px; min-width:148px; padding:9px; flex-shrink:0; border-right:1px solid #ebebeb; }
-.lc-size    { width:96px;  min-width:96px;  padding:9px; flex-shrink:0; border-right:1px solid #ebebeb; font-size:10px; color:#555; line-height:1.45; }
-.lc-type    { width:76px;  min-width:76px;  padding:9px; flex-shrink:0; border-right:1px solid #ebebeb; }
-.lc-price   { width:108px; min-width:108px; padding:9px; flex-shrink:0; border-right:1px solid #ebebeb; }
-.lc-comments{ flex:1;      min-width:0;     padding:9px; border-right:1px solid #ebebeb; }
-.lc-contact { width:84px;  min-width:84px;  padding:9px; flex-shrink:0; }
+/* Listing row - flexbox for reliable print */
+.l-row { display:flex; border-bottom:1px solid #e5e5e5; align-items:stretch; box-sizing:border-box; }
+.l-row:nth-child(even) { background:#fafafa; }
 
-/* cell contents */
-.l-img { width:60px; height:46px; object-fit:cover; display:block; border-radius:1px; }
-.l-img-ph { width:60px; height:46px; background:#eee; border-radius:1px; }
-.l-addr { font-family:'Montserrat',sans-serif; font-weight:800; font-size:10px; color:#111; line-height:1.3; margin-bottom:2px; }
-.l-mls  { font-size:9px; color:#aaa; margin-bottom:3px; }
-.l-broch { font-family:'Montserrat',sans-serif; font-weight:800; font-size:7.5px; letter-spacing:.8px; text-transform:uppercase; color:#EA002A; text-decoration:none; border:1px solid #EA002A; padding:1px 5px; border-radius:1px; display:inline-block; margin-top:2px; }
-.l-price-v { font-family:'Montserrat',sans-serif; font-weight:800; font-size:10.5px; color:#111; line-height:1.4; }
-.l-bullet { padding-left:11px; position:relative; font-size:9.5px; color:#444; line-height:1.45; margin-bottom:1px; }
-.l-bullet::before { content:'·'; position:absolute; left:0; color:#EA002A; font-weight:900; font-size:12px; line-height:1.2; }
-.l-contact-n  { font-family:'Montserrat',sans-serif; font-weight:800; font-size:10px; color:#111; line-height:1.4; }
-.l-contact-n2 { font-size:9px; color:#999; margin-top:2px; }
+/* Fixed column widths */
+.lc-ph  { width:72px;  min-width:72px;  flex-shrink:0; padding:8px; border-right:1px solid #ebebeb; box-sizing:border-box; }
+.lc-pr  { width:150px; min-width:150px; flex-shrink:0; padding:8px; border-right:1px solid #ebebeb; box-sizing:border-box; }
+.lc-sz  { width:92px;  min-width:92px;  flex-shrink:0; padding:8px; border-right:1px solid #ebebeb; font-size:9.5px; color:#555; line-height:1.4; box-sizing:border-box; }
+.lc-ty  { width:74px;  min-width:74px;  flex-shrink:0; padding:8px; border-right:1px solid #ebebeb; box-sizing:border-box; }
+.lc-px  { width:104px; min-width:104px; flex-shrink:0; padding:8px; border-right:1px solid #ebebeb; box-sizing:border-box; }
+.lc-cm  { flex:1;      min-width:0;     padding:8px; border-right:1px solid #ebebeb; box-sizing:border-box; }
+.lc-ct  { width:84px;  min-width:84px;  flex-shrink:0; padding:8px; box-sizing:border-box; }
 
-/* badges */
-.bdg { display:inline-block; padding:2px 6px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:8px; letter-spacing:.8px; text-transform:uppercase; border-radius:2px; }
-.b-sale   { background:rgba(234,0,42,.08); color:#EA002A; }
-.b-lease  { background:rgba(0,100,200,.07); color:#0055aa; }
-.b-sold   { background:#ffebee; color:#c62828; }
-.b-leased { background:#fff3e0; color:#e65100; font-size:7.5px; }
-.b-cs     { background:#fce4ec; color:#880e4f; }
-.b-cl     { background:#ede7f6; color:#4527a0; }
-.b-new    { background:#e8f5e9; color:#2e7d32; display:block; margin-bottom:2px; }
-.b-pr     { background:#fff8e1; color:#f57f17; display:block; margin-top:2px; font-size:7px; }
-.b-remains{ display:block; font-size:7px; color:#aaa; margin-top:1px; }
+/* Cell content */
+.l-img    { width:58px; height:44px; object-fit:cover; display:block; border-radius:1px; }
+.l-img-ph { width:58px; height:44px; background:#eee; border-radius:1px; display:block; }
+.l-addr   { font-family:'Montserrat',sans-serif; font-weight:800; font-size:9.5px; color:#111; line-height:1.3; margin-bottom:2px; }
+.l-mls    { font-size:8.5px; color:#bbb; margin-bottom:2px; }
+.l-broch  { font-family:'Montserrat',sans-serif; font-weight:800; font-size:7px; letter-spacing:.8px; text-transform:uppercase; color:#EA002A; text-decoration:none; border:1px solid #EA002A; padding:1px 5px; border-radius:1px; display:inline-block; margin-top:2px; }
+.l-pv     { font-family:'Montserrat',sans-serif; font-weight:800; font-size:10px; color:#111; line-height:1.4; }
+.l-bul    { padding-left:10px; position:relative; font-size:9px; color:#444; line-height:1.4; margin-bottom:1px; }
+.l-bul::before { content:'·'; position:absolute; left:0; color:#EA002A; font-weight:900; font-size:11px; line-height:1.2; }
+.l-cn     { font-family:'Montserrat',sans-serif; font-weight:800; font-size:9.5px; color:#111; line-height:1.4; }
+.l-cn2    { font-size:8.5px; color:#aaa; margin-top:1px; }
 
-/* ─── NEEDS TABLE ────────────────────────────────────── */
+/* Badges */
+.bdg { display:inline-block; padding:2px 6px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:7.5px; letter-spacing:.8px; text-transform:uppercase; border-radius:2px; }
+.b-sa { background:rgba(234,0,42,.08); color:#EA002A; }
+.b-le { background:rgba(0,100,200,.07); color:#0055aa; }
+.b-so { background:#ffebee; color:#c62828; }
+.b-la { background:#fff3e0; color:#e65100; }
+.b-cs { background:#fce4ec; color:#880e4f; }
+.b-cl { background:#ede7f6; color:#4527a0; }
+.b-nw { background:#e8f5e9; color:#2e7d32; display:block; margin-bottom:2px; }
+.b-pr { background:#fff8e1; color:#f57f17; display:block; margin-top:2px; font-size:7px; }
+.b-rm { display:block; font-size:7px; color:#bbb; margin-top:1px; }
+
+/* ══════════════════════
+   NEEDS & WANTS
+══════════════════════ */
 .needs-col-hdr { display:flex; background:#2e2e2e; }
-.needs-col-hdr div { font-family:'Montserrat',sans-serif; font-weight:700; font-size:8.5px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.6); padding:8px 9px; border-right:1px solid rgba(255,255,255,.06); }
-.needs-col-hdr div:last-child { border-right:none; }
-.needs-row { display:flex; border-bottom:1px solid #e5e5e5; align-items:stretch; }
-.needs-row:nth-child(even) { background:#fafafa; }
-.needs-row:last-child { border-bottom:none; }
-.nc-cat  { width:90px;  min-width:90px;  padding:9px; flex-shrink:0; border-right:1px solid #ebebeb; }
-.nc-desc { flex:1;      padding:9px; border-right:1px solid #ebebeb; font-size:10px; color:#333; line-height:1.5; }
-.nc-bud  { width:120px; min-width:120px; padding:9px; flex-shrink:0; border-right:1px solid #ebebeb; font-size:10px; color:#111; font-weight:700; }
-.nc-loc  { width:110px; min-width:110px; padding:9px; flex-shrink:0; border-right:1px solid #ebebeb; font-size:10px; color:#555; }
-.nc-sz   { width:90px;  min-width:90px;  padding:9px; flex-shrink:0; border-right:1px solid #ebebeb; font-size:10px; color:#555; }
-.nc-agt  { width:82px;  min-width:82px;  padding:9px; flex-shrink:0; }
-.n-cat-bdg { display:inline-block; padding:2px 6px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:8px; letter-spacing:.8px; text-transform:uppercase; border-radius:2px; background:rgba(234,0,42,.08); color:#EA002A; }
+.needs-col-hdr > div { font-family:'Montserrat',sans-serif; font-weight:700; font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); padding:7px 9px; border-right:1px solid rgba(255,255,255,.06); box-sizing:border-box; }
+.needs-col-hdr > div:last-child { border-right:none; }
+.n-row { display:flex; border-bottom:1px solid #e5e5e5; align-items:stretch; }
+.n-row:nth-child(even) { background:#fafafa; }
+.nc-cat { width:90px;  min-width:90px;  flex-shrink:0; padding:8px; border-right:1px solid #ebebeb; box-sizing:border-box; }
+.nc-dsc { flex:1;      padding:8px; border-right:1px solid #ebebeb; font-size:9.5px; color:#333; line-height:1.5; box-sizing:border-box; }
+.nc-bud { width:120px; min-width:120px; flex-shrink:0; padding:8px; border-right:1px solid #ebebeb; font-size:9.5px; font-weight:700; color:#111; box-sizing:border-box; }
+.nc-loc { width:110px; min-width:110px; flex-shrink:0; padding:8px; border-right:1px solid #ebebeb; font-size:9.5px; color:#555; box-sizing:border-box; }
+.nc-sz  { width:88px;  min-width:88px;  flex-shrink:0; padding:8px; border-right:1px solid #ebebeb; font-size:9.5px; color:#555; box-sizing:border-box; }
+.nc-agt { width:84px;  min-width:84px;  flex-shrink:0; padding:8px; box-sizing:border-box; }
+.n-cat-b { display:inline-block; padding:2px 6px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:7.5px; letter-spacing:.8px; text-transform:uppercase; border-radius:2px; background:rgba(234,0,42,.08); color:#EA002A; }
 
-/* ─── ROSTER ─────────────────────────────────────────── */
-.roster { padding:32px; page-break-before:always; }
-.roster-hdr { font-family:'Montserrat',sans-serif; font-weight:900; font-size:18px; letter-spacing:4px; text-transform:uppercase; color:#fff; background:#EA002A; padding:10px 20px; display:inline-block; margin-bottom:18px; }
+/* ══════════════════════
+   ASSOCIATES ROSTER
+══════════════════════ */
+.roster-wrap { width:100%; padding:32px 32px 28px; box-sizing:border-box; border-top:3px solid #EA002A; }
+.roster-hdr { font-family:'Montserrat',sans-serif; font-weight:900; font-size:16px; letter-spacing:4px; text-transform:uppercase; color:#fff; background:#EA002A; padding:10px 18px; display:inline-block; margin-bottom:16px; }
 .roster-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:#ddd; border:1px solid #ddd; }
 .r-card { background:#fff; padding:14px 10px; text-align:center; }
-.r-photo { width:56px; height:56px; border-radius:50%; object-fit:cover; margin:0 auto 7px; display:block; background:#eee; border:2px solid #ddd; }
-.r-photo-ph { width:56px; height:56px; border-radius:50%; background:#eee; border:2px solid #ddd; margin:0 auto 7px; }
-.r-name  { font-family:'Montserrat',sans-serif; font-weight:800; font-size:10.5px; color:#111; margin-bottom:2px; }
-.r-title { font-size:9px; color:#888; line-height:1.3; margin-bottom:5px; }
-.r-phone { font-family:'Montserrat',sans-serif; font-weight:700; font-size:9.5px; color:#EA002A; margin-bottom:1px; }
-.r-email { font-size:9px; color:#aaa; word-break:break-all; }
-.r-web   { font-size:8.5px; color:#EA002A; margin-top:2px; }
-.roster-foot { text-align:center; margin-top:18px; }
-.roster-foot img { height:36px; width:auto; opacity:.75; }
+.r-ph { width:54px; height:54px; border-radius:50%; object-fit:cover; margin:0 auto 7px; display:block; background:#eee; border:2px solid #ddd; }
+.r-ph-ph { width:54px; height:54px; border-radius:50%; background:#eee; border:2px solid #ddd; margin:0 auto 7px; display:block; }
+.r-nm { font-family:'Montserrat',sans-serif; font-weight:800; font-size:10px; color:#111; margin-bottom:2px; }
+.r-tt { font-size:8.5px; color:#888; line-height:1.3; margin-bottom:5px; }
+.r-ph-t { font-family:'Montserrat',sans-serif; font-weight:700; font-size:9px; color:#EA002A; margin-bottom:1px; }
+.r-em { font-size:8.5px; color:#aaa; word-break:break-all; }
+.r-wb { font-size:8px; color:#EA002A; margin-top:2px; }
+.roster-foot { text-align:center; margin-top:16px; }
+.roster-foot img { height:32px; width:auto; opacity:.7; }
 
-/* ─── AGENT FOOTER ───────────────────────────────────── */
-.af-page {
-  background:#111; min-height:7in;
+/* ══════════════════════
+   AGENT FOOTER
+══════════════════════ */
+.af-wrap {
+  width:100%; height:7.8in;
+  background:#111;
   display:flex; flex-direction:column;
   align-items:center; justify-content:center;
-  text-align:center; padding:56px 40px;
-  position:relative;
+  text-align:center; padding:48px;
+  position:relative; overflow:hidden;
+  box-sizing:border-box;
 }
-.af-lbar { position:absolute; top:0; left:0; width:8px; height:100%; background:#EA002A; }
-.af-tbar { position:absolute; top:0; left:0; right:0; height:3px; background:#EA002A; }
-.af-eye  { font-family:'Montserrat',sans-serif; font-weight:700; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.3); margin-bottom:16px; position:relative; }
-.af-ph   { width:96px; height:96px; border-radius:50%; object-fit:cover; border:3px solid #EA002A; margin:0 auto 14px; display:block; position:relative; background:#333; }
-.af-ph-ph{ width:96px; height:96px; border-radius:50%; background:#333; border:3px solid #EA002A; margin:0 auto 14px; position:relative; }
-.af-name { font-family:'Montserrat',sans-serif; font-weight:900; font-size:28px; color:#fff; margin-bottom:4px; position:relative; }
-.af-ttl  { font-size:13px; color:rgba(255,255,255,.4); margin-bottom:22px; line-height:1.5; position:relative; }
-.af-tel  { font-family:'Montserrat',sans-serif; font-weight:800; font-size:22px; color:#EA002A; margin-bottom:6px; position:relative; }
-.af-em   { font-size:14px; color:rgba(255,255,255,.45); position:relative; }
-.af-web  { font-size:13px; color:#EA002A; margin-top:8px; position:relative; }
-.af-brand{ margin-top:30px; padding-top:22px; border-top:1px solid rgba(255,255,255,.1); position:relative; text-align:center; }
-.af-brand img { height:44px; width:auto; display:block; margin:0 auto 10px; opacity:.75; }
-.af-brand-t { font-size:10px; color:rgba(255,255,255,.18); letter-spacing:1px; }
+.af-wrap::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(234,0,42,.04) 60px,rgba(234,0,42,.04) 61px); pointer-events:none; }
+.af-tbar { position:absolute; top:0; left:0; right:0; height:4px; background:#EA002A; }
+.af-bbar { position:absolute; bottom:0; left:0; right:0; height:4px; background:#EA002A; }
+.af-eye  { font-family:'Montserrat',sans-serif; font-weight:700; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.3); margin-bottom:16px; position:relative; z-index:1; }
+.af-ph   { width:96px; height:96px; border-radius:50%; object-fit:cover; border:3px solid #EA002A; margin:0 auto 14px; display:block; position:relative; z-index:1; background:#333; }
+.af-ph-ph{ width:96px; height:96px; border-radius:50%; background:#333; border:3px solid #EA002A; margin:0 auto 14px; display:block; position:relative; z-index:1; }
+.af-nm   { font-family:'Montserrat',sans-serif; font-weight:900; font-size:28px; color:#fff; margin-bottom:4px; position:relative; z-index:1; }
+.af-tt   { font-size:13px; color:rgba(255,255,255,.4); margin-bottom:22px; line-height:1.5; position:relative; z-index:1; }
+.af-tel  { font-family:'Montserrat',sans-serif; font-weight:800; font-size:22px; color:#EA002A; margin-bottom:6px; position:relative; z-index:1; }
+.af-em   { font-size:14px; color:rgba(255,255,255,.45); position:relative; z-index:1; }
+.af-wb   { font-size:13px; color:#EA002A; margin-top:8px; position:relative; z-index:1; }
+.af-brand{ margin-top:28px; padding-top:20px; border-top:1px solid rgba(255,255,255,.1); position:relative; z-index:1; }
+.af-brand img { height:40px; width:auto; display:block; margin:0 auto 8px; opacity:.7; }
+.af-brand-t { font-size:10px; color:rgba(255,255,255,.18); letter-spacing:.5px; }
 
-/* ─── PRINT ──────────────────────────────────────────── */
+/* ══════════════════════
+   PRINT
+══════════════════════ */
 @media print {
-  @page {
-    size: landscape;
-    margin: 0.3in 0.3in 0.3in 0.3in;
-  }
+  @page { size:landscape; margin:0.25in; }
   #controls { display:none !important; }
-  html, body { padding:0; margin:0; background:#fff; }
-  .page {
-    width: 100%;
-    height: auto;
-    min-height: 0;
-    margin: 0;
-    box-shadow: none;
-    overflow: visible;
-    box-sizing: border-box;
-  }
-  .cover, .toc, .roster, .af-page { page-break-after: always; }
-  .sec-block { page-break-inside: avoid; }
-  .listing-row { page-break-inside: avoid; }
-  .needs-row { page-break-inside: avoid; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  .listing-row { page-break-inside: avoid; }
-  .needs-row   { page-break-inside: avoid; }
-  /* Force all flex rows to stay inline */
-  .listing-row { display: flex !important; flex-wrap: nowrap !important; }
-  .lc-photo, .lc-prop, .lc-size, .lc-type, .lc-price, .lc-comments, .lc-contact {
-    flex-shrink: 0 !important;
-    overflow: visible !important;
-  }
-  .lc-comments { flex: 1 !important; }
+  html,body { margin:0; padding:0; background:#fff; }
+  #report { width:100%; box-shadow:none; }
+  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  .cover    { page-break-after:always; height:100vh; }
+  .toc      { page-break-after:always; }
+  .l-row    { page-break-inside:avoid; }
+  .n-row    { page-break-inside:avoid; }
+  .cat-header { page-break-inside:avoid; page-break-after:avoid; }
+  .roster-wrap { page-break-before:always; }
+  .af-wrap  { page-break-before:always; height:100vh; }
+  /* Keep col header with first row of each section */
+  .col-hdr  { page-break-after:avoid; }
 }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -228,26 +219,25 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
   <span class="cl">Report</span>
   <select id="agentSelect"><option value="all">Full Report — All Listings</option></select>
   <button class="cb cb-r" id="saveBtn" onclick="savePDF()">⬇ Save PDF</button>
+  <button class="cb cb-b" onclick="window.print()">🖨 Print</button>
   <div class="cdv"></div>
   <button class="cb cb-g" onclick="window.close()">← Back</button>
   <div class="cdv"></div>
-  <span class="hint">Print: <strong>Landscape · 11×8.5 · Background graphics ON · No margins</strong></span>
+  <span class="hint">Print: <strong>Landscape · Background graphics ON</strong></span>
   <div class="cdv"></div>
   <span id="sm">Loading…</span>
 </div>
 
-<div id="pages"></div>
+<div id="report"></div>
 
 <script>
+// ── CONFIG ──────────────────────────────────────────
 const LISTINGS_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTToAC7Jf5XxoV-vZe6K7jgMudt_3vJClps8j6qDW4wyET3Wj-BQRUwQqNpBA4rW1hjn7hNfbfh_Y9I/pub?gid=118750696&single=true&output=csv';
 const AGENTS_CSV   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTToAC7Jf5XxoV-vZe6K7jgMudt_3vJClps8j6qDW4wyET3Wj-BQRUwQqNpBA4rW1hjn7hNfbfh_Y9I/pub?gid=237844589&single=true&output=csv';
 const NEEDS_CSV    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTToAC7Jf5XxoV-vZe6K7jgMudt_3vJClps8j6qDW4wyET3Wj-BQRUwQqNpBA4rW1hjn7hNfbfh_Y9I/pub?gid=1815568429&single=true&output=csv';
-const MONTH = (() => {
-  const now = new Date();
-  return now.toLocaleString('en-US', { month: 'long' }) + ' ' + now.getFullYear();
-})();
 const LOGO         = 'https://kyleduiker.github.io/commercial-listings/media/2024%20RLP%20Commercial%20Logos_White-Red%20-%20Brokerage%20.png';
 const SOL_LOGO     = 'https://drive.google.com/uc?export=view&id=18AMz4wqTMO0_PGrm66Ir8A0RRaZxVvJT';
+const MONTH        = (()=>{ const n=new Date(); return n.toLocaleString('en-US',{month:'long'})+' '+n.getFullYear(); })();
 
 const CATS = ['Industrial','Investment','Land','Office','Retail','Business'];
 const CLBL = {
@@ -258,6 +248,7 @@ const CLBL = {
 
 let listings=[], agents=[], needs=[], curAgent='all';
 
+// ── CSV PARSER ───────────────────────────────────────
 function csv(t){
   const r=[];let row=[],c='',q=false;
   for(let i=0;i<t.length;i++){
@@ -271,216 +262,207 @@ function csv(t){
   return r;
 }
 
+// ── LOAD ─────────────────────────────────────────────
 async function load(){
   try{
     const r1=await fetch(LISTINGS_CSV);
-    listings=csv(await r1.text()).slice(1)
-      .filter(r=>r[0]&&r[0]!=='Category')
-      .map(r=>({cat:r[0]||'',addr:r[1]||'',mls:r[2]||'',size:r[3]||'',type:r[4]||'Sale',price:r[5]||'',comments:r[6]||'',agent:r[7]||'',status:r[8]||'Active',photo:r[9]||'',brochure:r[10]||'',agent2:r[11]||''}));
+    listings=csv(await r1.text()).slice(1).filter(r=>r[0]&&r[0]!=='Category').map(r=>({
+      cat:r[0]||'', addr:r[1]||'', mls:r[2]||'', size:r[3]||'',
+      type:r[4]||'Sale', price:r[5]||'', comments:r[6]||'',
+      agent:r[7]||'', status:r[8]||'Active', photo:r[9]||'',
+      brochure:r[10]||'', agent2:r[11]||''
+    }));
     const r2=await fetch(AGENTS_CSV);
-    agents=csv(await r2.text()).slice(2)
-      .filter(r=>r[0]&&r[0]!=='Agent Name')
-      .map(r=>({name:r[0]||'',title:r[1]||'',phone:r[2]||'',email:r[3]||'',photo:r[4]||'',website:r[5]||''}))
-      .sort((a,b)=>a.name.localeCompare(b.name));
+    agents=csv(await r2.text()).slice(2).filter(r=>r[0]&&r[0]!=='Agent Name').map(r=>({
+      name:r[0]||'', title:r[1]||'', phone:r[2]||'',
+      email:r[3]||'', photo:r[4]||'', website:r[5]||''
+    })).sort((a,b)=>a.name.localeCompare(b.name));
     const r3=await fetch(NEEDS_CSV);
-    needs=csv(await r3.text()).slice(1)
-      .filter(r=>r[0]&&r[0]!=='Category'&&r[0]!=='CATEGORY')
-      .map(r=>({cat:r[0]||'',desc:r[1]||'',budget:r[2]||'',loc:r[3]||'',size:r[4]||'',agent:r[5]||'',date:r[6]||''}));
-    document.getElementById('sm').textContent=listings.length+' listings ✓';
-  }catch(e){
-    document.getElementById('sm').textContent='offline — no data';
+    needs=csv(await r3.text()).slice(1).filter(r=>r[0]&&r[0]!=='Category'&&r[0]!=='CATEGORY').map(r=>({
+      cat:r[0]||'', desc:r[1]||'', budget:r[2]||'',
+      loc:r[3]||'', size:r[4]||'', agent:r[5]||'', date:r[6]||''
+    }));
+    document.getElementById('sm').textContent = listings.length+' listings loaded ✓';
+  } catch(e){
+    document.getElementById('sm').textContent = 'Error loading data';
+    console.error(e);
   }
 }
 
+// ── BADGE ─────────────────────────────────────────────
 function bdg(status,type){
-  const s=(status||'').toLowerCase(),t=(type||'').toLowerCase();
-  const sl=t==='lease'?'b-lease':'b-sale', sl2=t==='lease'?'Lease':'Sale';
-  if(s==='sold')return`<span class="bdg b-sold">Sold</span>`;
-  if(s==='conditionally sold')return`<span class="bdg b-cs">Cond. Sold</span>`;
-  if(s==='leased')return`<span class="bdg b-leased">Leased</span><span class="b-remains">Remains for Sale</span>`;
-  if(s==='conditionally leased')return`<span class="bdg b-cl">Cond. Leased</span>`;
-  if(s==='new')return`<span class="bdg b-new">New</span><span class="bdg ${sl}">${sl2}</span>`;
-  if(s==='price reduction')return`<span class="bdg ${sl}">${sl2}</span><span class="bdg b-pr">Price Reduced</span>`;
-  return`<span class="bdg ${sl}">${sl2}</span>`;
+  const s=(status||'').toLowerCase(), t=(type||'').toLowerCase();
+  const sl=t==='lease'?'b-le':'b-sa', sl2=t==='lease'?'Lease':'Sale';
+  if(s==='sold')            return`<span class="bdg b-so">Sold</span>`;
+  if(s==='conditionally sold')   return`<span class="bdg b-cs">Cond. Sold</span>`;
+  if(s==='leased')          return`<span class="bdg b-la">Leased</span><span class="b-rm">Remains for Sale</span>`;
+  if(s==='conditionally leased') return`<span class="bdg b-cl">Cond. Leased</span>`;
+  if(s==='new')             return`<span class="bdg b-nw">New</span><span class="bdg ${sl}">${sl2}</span>`;
+  if(s==='price reduction') return`<span class="bdg ${sl}">${sl2}</span><span class="bdg b-pr">Price Reduced</span>`;
+  return `<span class="bdg ${sl}">${sl2}</span>`;
 }
 
-function row(l){
-  const buls=(l.comments||'').split('|').filter(Boolean).map(b=>`<div class="l-bullet">${b.trim()}</div>`).join('');
-  return`<div class="listing-row">
-    <div class="lc-photo">
-      ${l.photo?`<img class="l-img" src="${l.photo}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:''}
-      <div class="l-img-ph" style="${l.photo?'display:none':''}"></div>
-    </div>
-    <div class="lc-prop">
-      <div class="l-addr">${(l.addr||'').replace(/\n/g,'<br>')}</div>
-      ${l.mls?`<div class="l-mls">MLS# ${l.mls}</div>`:''}
-      ${l.brochure?`<a class="l-broch" href="${l.brochure}">⬇ Brochure</a>`:''}
-    </div>
-    <div class="lc-size">${(l.size||'—').replace(/\n/g,'<br>')}</div>
-    <div class="lc-type">${bdg(l.status,l.type)}</div>
-    <div class="lc-price"><div class="l-price-v">${(l.price||'—').replace(/\n/g,'<br>')}</div></div>
-    <div class="lc-comments">${buls}</div>
-    <div class="lc-contact">
-      <div class="l-contact-n">${l.agent||'—'}</div>
-      ${l.agent2?`<div class="l-contact-n2">${l.agent2}</div>`:''}
-    </div>
+// ── LISTING ROW ───────────────────────────────────────
+function lrow(l){
+  const buls=(l.comments||'').split('|').filter(Boolean).map(b=>`<div class="l-bul">${b.trim()}</div>`).join('');
+  return`<div class="l-row">
+    <div class="lc-ph">${l.photo?`<img class="l-img" src="${l.photo}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:''}
+      <div class="l-img-ph" style="${l.photo?'display:none':''}"></div></div>
+    <div class="lc-pr"><div class="l-addr">${(l.addr||'').replace(/\n/g,'<br>')}</div>${l.mls?`<div class="l-mls">MLS# ${l.mls}</div>`:''} ${l.brochure?`<a class="l-broch" href="${l.brochure}">⬇ Brochure</a>`:''}</div>
+    <div class="lc-sz">${(l.size||'—').replace(/\n/g,'<br>')}</div>
+    <div class="lc-ty">${bdg(l.status,l.type)}</div>
+    <div class="lc-px"><div class="l-pv">${(l.price||'—').replace(/\n/g,'<br>')}</div></div>
+    <div class="lc-cm">${buls}</div>
+    <div class="lc-ct"><div class="l-cn">${l.agent||'—'}</div>${l.agent2?`<div class="l-cn2">${l.agent2}</div>`:''}</div>
   </div>`;
 }
 
+// ── TABS ─────────────────────────────────────────────
 function tabs(active){
-  return CATS.map(c=>`<div class="sec-tab${c===active?' on':''}">${c}</div>`).join('');
+  return CATS.map(c=>`<div class="cat-tab${c===active?' on':''}">${c}</div>`).join('');
 }
 
-function cover(agentName){
-  const ia=agentName&&agentName!=='all';
-  return`<div class="page cover">
-    <div class="c-tbar"></div>
-    <img class="c-logo" src="${LOGO}" alt="" onerror="this.style.display='none'">
-    <div class="c-title">Commercial Listings</div>
-    <div class="c-month">${MONTH}</div>
-    ${ia?`<div class="c-agent">${agentName}</div>`:''}
-    <div class="c-url">www.royallepagesolutions.com/commercial</div>
+// ── COL HEADER ────────────────────────────────────────
+const COL_HDR = `<div class="col-hdr">
+  <div style="width:72px;min-width:72px;"></div>
+  <div style="width:150px;min-width:150px;">Property</div>
+  <div style="width:92px;min-width:92px;">Size</div>
+  <div style="width:74px;min-width:74px;">Sale/Lease</div>
+  <div style="width:104px;min-width:104px;">Asking Price</div>
+  <div style="flex:1;">Comments</div>
+  <div style="width:84px;min-width:84px;">Contact</div>
+</div>`;
+
+// ── BUILD HTML ────────────────────────────────────────
+function build(){
+  const ia = curAgent !== 'all';
+  const ls = ia ? listings.filter(l=>l.agent===curAgent||l.agent2===curAgent) : listings;
+  const ac = CATS.filter(c=>ls.some(l=>l.cat===c));
+  const ao = ia ? (agents.find(a=>a.name===curAgent)||{name:curAgent,title:'Associate\nCommercial Division',phone:'',email:'',photo:'',website:''}) : null;
+
+  // COVER
+  let html = `<div class="cover">
+    <div class="cover-tbar"></div>
+    <div class="cover-bbar"></div>
+    <img class="cover-logo" src="${LOGO}" alt="" onerror="this.style.display='none'">
+    <div class="cover-title">Commercial Listings</div>
+    <div class="cover-month">${MONTH}</div>
+    ${ia?`<div class="cover-agent">${curAgent}</div>`:''}
+    <div class="cover-url">www.royallepagesolutions.com/commercial</div>
   </div>`;
-}
 
-function toc(ls){
-  const ac=CATS.filter(c=>ls.some(l=>l.cat===c));
-  return`<div class="page toc">
+  // TOC
+  html += `<div class="toc">
     <div class="toc-title">Table of Contents</div>
     ${ac.map(c=>`<div class="toc-row"><span class="toc-name">${CLBL[c]}</span></div>`).join('')}
+    ${!ia&&needs.length?`<div class="toc-row"><span class="toc-name">Needs &amp; Wants</span></div>`:''}
+    ${!ia&&agents.length?`<div class="toc-row"><span class="toc-name">Our Associates</span></div>`:''}
   </div>`;
-}
 
-function section(cat,ls){
-  return`<div class="sec-block">
-    <div class="sec-hdr">
-      <div class="sec-red">${CLBL[cat]||cat}</div>
-      <div class="sec-tabs">${tabs(cat)}</div>
-    </div>
-    <div class="col-hdr">
-      <div style="width:76px;min-width:76px;"></div>
-      <div style="width:148px;min-width:148px;">Property</div>
-      <div style="width:96px;min-width:96px;">Size</div>
-      <div style="width:76px;min-width:76px;">Sale/Lease</div>
-      <div style="width:108px;min-width:108px;">Asking Price</div>
-      <div style="flex:1;">Comments</div>
-      <div style="width:84px;min-width:84px;">Contact</div>
-    </div>
-    ${ls.map(row).join('')}
-  </div>`;
-}
+  // LISTINGS FLOW - all categories continuous
+  html += `<div class="listings-flow">`;
+  html += COL_HDR;
+  ac.forEach(cat => {
+    const catls = ls.filter(l=>l.cat===cat);
+    html += `<div class="cat-header"><div class="cat-red">${CLBL[cat]}</div><div class="cat-tabs">${tabs(cat)}</div></div>`;
+    html += catls.map(lrow).join('');
+  });
 
-function needsPage(ns){
-  if(!ns.length)return'';
-  return`<div class="sec-block">
-    <div class="sec-hdr">
-      <div class="sec-red">Needs &amp; Wants</div>
-      <div class="sec-tabs"><div class="sec-tab">Buyer Requirements — Contact Agent If You Have A Match</div></div>
-    </div>
-    <div class="needs-col-hdr">
+  // NEEDS & WANTS - flows after listings
+  if(!ia && needs.length){
+    html += `<div class="cat-header"><div class="cat-red">Needs &amp; Wants</div><div class="cat-tabs" style="padding:0 14px;font-family:'Montserrat',sans-serif;font-size:8px;letter-spacing:1.5px;color:rgba(255,255,255,.3);text-transform:uppercase;display:flex;align-items:center;">Buyer Requirements — Contact Agent If You Have A Match</div></div>`;
+    html += `<div class="needs-col-hdr">
       <div style="width:90px;min-width:90px;">Category</div>
       <div style="flex:1;">What They're Looking For</div>
       <div style="width:120px;min-width:120px;">Budget / Rate</div>
       <div style="width:110px;min-width:110px;">Location</div>
-      <div style="width:90px;min-width:90px;">Size</div>
-      <div style="width:82px;min-width:82px;">Agent</div>
-    </div>
-    ${ns.map(n=>`<div class="needs-row">
-      <div class="nc-cat"><span class="n-cat-bdg">${n.cat}</span></div>
-      <div class="nc-desc">${n.desc}</div>
+      <div style="width:88px;min-width:88px;">Size</div>
+      <div style="width:84px;min-width:84px;">Agent</div>
+    </div>`;
+    html += needs.map(n=>`<div class="n-row">
+      <div class="nc-cat"><span class="n-cat-b">${n.cat}</span></div>
+      <div class="nc-dsc">${n.desc}</div>
       <div class="nc-bud">${n.budget}</div>
       <div class="nc-loc">${n.loc}</div>
       <div class="nc-sz">${n.size}</div>
-      <div class="nc-agt"><div class="l-contact-n">${n.agent}</div><div style="font-size:8.5px;color:#bbb;">${n.date}</div></div>
-    </div>`).join('')}
-  </div>`;
+      <div class="nc-agt"><div class="l-cn">${n.agent}</div><div style="font-size:8px;color:#bbb;">${n.date}</div></div>
+    </div>`).join('');
+  }
+  html += `</div>`; // end listings-flow
+
+  // ASSOCIATES
+  if(!ia && agents.length){
+    const cards = agents.map(a=>`<div class="r-card">
+      ${a.photo?`<img class="r-ph" src="${a.photo}" alt="${a.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:''}
+      <div class="r-ph-ph" style="${a.photo?'display:none':''}"></div>
+      <div class="r-nm">${a.name}</div>
+      <div class="r-tt">${(a.title||'').replace(/\n/g,'<br>')}</div>
+      <div class="r-ph-t">${a.phone}</div>
+      <div class="r-em">${a.email}</div>
+      ${a.website?`<div class="r-wb">${a.website.replace(/https?:\/\//,'')}</div>`:''}
+    </div>`).join('');
+    html += `<div class="roster-wrap">
+      <div class="roster-hdr">Our Associates</div>
+      <div class="roster-grid">${cards}</div>
+      <div class="roster-foot"><img src="${SOL_LOGO}" alt="" onerror="this.style.display='none'"></div>
+    </div>`;
+  }
+
+  // AGENT FOOTER
+  if(ia && ao){
+    html += `<div class="af-wrap">
+      <div class="af-tbar"></div><div class="af-bbar"></div>
+      ${ao.photo?`<img class="af-ph" src="${ao.photo}" alt="${ao.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:''}
+      <div class="af-ph-ph" style="${ao.photo?'display:none':''}"></div>
+      <div class="af-eye">For further information, please contact:</div>
+      <div class="af-nm">${ao.name}</div>
+      <div class="af-tt">${(ao.title||'Associate\nCommercial Division').replace(/\n/g,'<br>')}</div>
+      <div class="af-tel">${ao.phone}</div>
+      <div class="af-em">${ao.email}</div>
+      ${ao.website?`<div class="af-wb">${ao.website.replace(/https?:\/\//,'')}</div>`:''}
+      <div class="af-brand">
+        <img src="${SOL_LOGO}" alt="" onerror="this.style.display='none'">
+        <div class="af-brand-t">Royal LePage® Solutions — Commercial Division · www.royallepagesolutions.com</div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('report').innerHTML = html;
+  document.title = `RLP_Commercial_${MONTH.replace(/\s+/g,'_')}${ia?'_'+curAgent.replace(/\s+/g,'-'):'_Full-Report'}`;
 }
 
-function roster(ags){
-  const cards=ags.map(a=>`<div class="r-card">
-    ${a.photo?`<img class="r-photo" src="${a.photo}" alt="${a.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:''}
-    <div class="r-photo-ph" style="${a.photo?'display:none':''}"></div>
-    <div class="r-name">${a.name}</div>
-    <div class="r-title">${(a.title||'').replace(/\n/g,'<br>')}</div>
-    <div class="r-phone">${a.phone}</div>
-    <div class="r-email">${a.email}</div>
-    ${a.website?`<div class="r-web">${a.website.replace(/https?:\/\//,'')}</div>`:''}
-  </div>`).join('');
-  return`<div class="page roster">
-    <div class="roster-hdr">Our Associates</div>
-    <div class="roster-grid">${cards}</div>
-    <div class="roster-foot"><img src="${SOL_LOGO}" alt="" onerror="this.style.display='none'"></div>
-  </div>`;
-}
-
-function agentFooter(a){
-  if(!a)return'';
-  return`<div class="page af-page">
-    <div class="af-lbar"></div><div class="af-tbar"></div>
-    ${a.photo?`<img class="af-ph" src="${a.photo}" alt="${a.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:''}
-    <div class="af-ph-ph" style="${a.photo?'display:none':''}"></div>
-    <div class="af-eye">For further information, please contact:</div>
-    <div class="af-name">${a.name}</div>
-    <div class="af-ttl">${(a.title||'Associate\nCommercial Division').replace(/\n/g,'<br>')}</div>
-    <div class="af-tel">${a.phone}</div>
-    <div class="af-em">${a.email}</div>
-    ${a.website?`<div class="af-web">${a.website.replace(/https?:\/\//,'')}</div>`:''}
-    <div class="af-brand">
-      <img src="${SOL_LOGO}" alt="" onerror="this.style.display='none'">
-      <div class="af-brand-t">Royal LePage® Solutions — Commercial Division · www.royallepagesolutions.com</div>
-    </div>
-  </div>`;
-}
-
-function build(){
-  const ia=curAgent!=='all';
-  const ls=ia?listings.filter(l=>l.agent===curAgent||l.agent2===curAgent):listings;
-  const ac=CATS.filter(c=>ls.some(l=>l.cat===c));
-  const ao=ia?(agents.find(a=>a.name===curAgent)||{name:curAgent,title:'Associate\nCommercial Division',phone:'',email:'',photo:'',website:''}):null;
-  let html=cover(curAgent);
-  if(!ia)html+=toc(ls);
-  // Wrap all sections in one flowing page
-  let sectionsHtml='';
-  ac.forEach(cat=>sectionsHtml+=section(cat,ls.filter(l=>l.cat===cat)));
-  if(!ia&&needs.length)sectionsHtml+=needsPage(needs);
-  html+=`<div class="page">${sectionsHtml}</div>`;
-  if(!ia&&agents.length)html+=roster(agents);
-  if(ia&&ao)html+=agentFooter(ao);
-  document.getElementById('pages').innerHTML=html;
-  document.title=`RLP_Commercial_${MONTH.replace(/\s+/g,'_')}${ia?'_'+curAgent.replace(/\s+/g,'-'):'_Full-Report'}`;
-}
-
-function populateSel(){
-  const sel=document.getElementById('agentSelect');
-  const ags=[...new Set([...listings.map(l=>l.agent),...listings.map(l=>l.agent2)].filter(Boolean))].sort();
-  ags.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a+' — Individual Report';sel.appendChild(o);});
-  sel.onchange=()=>{curAgent=sel.value||'all';build();};
-}
-
+// ── SAVE PDF ──────────────────────────────────────────
 function savePDF(){
   const btn = document.getElementById('saveBtn');
-  btn.textContent = 'Generating…';
-  btn.disabled = true;
-  const ia = curAgent !== 'all';
+  btn.textContent='Generating…'; btn.disabled=true;
+  const ia = curAgent!=='all';
   const filename = `RLP_Commercial_${MONTH.replace(/\s+/g,'_')}${ia?'_'+curAgent.replace(/\s+/g,'-'):'_Full-Report'}.pdf`;
   const opt = {
-    margin: [0.3, 0.3, 0.3, 0.3],
-    filename: filename,
-    image: { type:'jpeg', quality:0.98 },
-    html2canvas: { scale:2, useCORS:true, allowTaint:true, logging:false },
-    jsPDF: { unit:'in', format:[11,8.5], orientation:'landscape' },
-    pagebreak: { mode:'avoid-all', before:'.page' }
+    margin:[0.25,0.25,0.25,0.25],
+    filename:filename,
+    image:{type:'jpeg',quality:0.95},
+    html2canvas:{scale:2,useCORS:true,allowTaint:true,logging:false},
+    jsPDF:{unit:'in',format:[11,8.5],orientation:'landscape'}
   };
-  html2pdf().set(opt).from(document.getElementById('pages')).save()
+  html2pdf().set(opt).from(document.getElementById('report')).save()
     .then(()=>{ btn.textContent='⬇ Save PDF'; btn.disabled=false; });
 }
 
+// ── POPULATE SELECT ───────────────────────────────────
+function populateSel(){
+  const sel=document.getElementById('agentSelect');
+  const ags=[...new Set([...listings.map(l=>l.agent),...listings.map(l=>l.agent2)].filter(Boolean))].sort();
+  ags.forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a+' — Individual Report'; sel.appendChild(o); });
+  sel.onchange=()=>{ curAgent=sel.value||'all'; build(); };
+}
+
+// ── INIT ──────────────────────────────────────────────
 async function init(){
   await load();
   populateSel();
   const p=new URLSearchParams(window.location.search);
   const ap=p.get('agent');
-  if(ap){curAgent=ap;document.getElementById('agentSelect').value=ap;}
+  if(ap){ curAgent=ap; document.getElementById('agentSelect').value=ap; }
   build();
 }
 init();
