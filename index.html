@@ -153,8 +153,10 @@ table.nt td:last-child { border-right:none; }
 .agents-section-header { background:var(--red); padding:12px 24px; font-family:'Montserrat',sans-serif; font-weight:900; font-size:13px; letter-spacing:2.5px; text-transform:uppercase; color:var(--white); display:inline-block; box-shadow:2px 2px 8px rgba(0,0,0,.12); }
 .agents-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); }
 .agent-card {
-  position:relative; height:240px;
-  background-size:cover; background-position:center top;
+  position:relative; height:280px;
+  background-size:contain;
+  background-repeat:no-repeat;
+  background-position:center 20%;
   background-color:var(--dark);
   border-right:1px solid var(--border); border-bottom:1px solid var(--border);
   overflow:hidden; transition:transform .2s;
