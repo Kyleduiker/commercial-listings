@@ -27,21 +27,22 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
 
 /* ─── PDF PAGE ──────────────────────────────────────── */
 .page {
-  width:10.5in;
-  min-height:7.6in;
+  width:10.4in;
+  height:7.8in;
   background:#fff;
   margin:12px auto;
   box-shadow:0 4px 20px rgba(0,0,0,.3);
   page-break-after:always;
   overflow:hidden;
   position:relative;
+  box-sizing:border-box;
 }
 .page:last-child { page-break-after:auto; }
 
 /* ─── COVER ─────────────────────────────────────────── */
 .cover {
   background:#111;
-  min-height:7.5in;
+  height:100%;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -49,6 +50,7 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
   text-align:center;
   padding:48px;
   position:relative;
+  box-sizing:border-box;
 }
 .cover::before {
   content:'';
@@ -196,6 +198,7 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
   html, body { padding:0; margin:0; background:#fff; }
   .page {
     width: 100%;
+    height: auto;
     min-height: 0;
     margin: 0;
     box-shadow: none;
@@ -216,13 +219,14 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
   .lc-comments { flex: 1 !important; }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
 <div id="controls">
   <span class="cl">Report</span>
   <select id="agentSelect"><option value="all">Full Report — All Listings</option></select>
-  <button class="cb cb-r" onclick="window.print()">⬇ Download PDF</button>
+  <button class="cb cb-r" id="saveBtn" onclick="savePDF()">⬇ Save PDF</button>
   <div class="cdv"></div>
   <button class="cb cb-g" onclick="window.close()">← Back</button>
   <div class="cdv"></div>
@@ -237,7 +241,10 @@ body { margin:0; padding:70px 0 0; background:#ccc; font-family:'Open Sans',sans
 const LISTINGS_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTToAC7Jf5XxoV-vZe6K7jgMudt_3vJClps8j6qDW4wyET3Wj-BQRUwQqNpBA4rW1hjn7hNfbfh_Y9I/pub?gid=118750696&single=true&output=csv';
 const AGENTS_CSV   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTToAC7Jf5XxoV-vZe6K7jgMudt_3vJClps8j6qDW4wyET3Wj-BQRUwQqNpBA4rW1hjn7hNfbfh_Y9I/pub?gid=237844589&single=true&output=csv';
 const NEEDS_CSV    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTToAC7Jf5XxoV-vZe6K7jgMudt_3vJClps8j6qDW4wyET3Wj-BQRUwQqNpBA4rW1hjn7hNfbfh_Y9I/pub?gid=1815568429&single=true&output=csv';
-const MONTH        = 'March 2026';
+const MONTH = (() => {
+  const now = new Date();
+  return now.toLocaleString('en-US', { month: 'long' }) + ' ' + now.getFullYear();
+})();
 const LOGO         = 'https://kyleduiker.github.io/commercial-listings/media/2024%20RLP%20Commercial%20Logos_White-Red%20-%20Brokerage%20.png';
 const SOL_LOGO     = 'https://drive.google.com/uc?export=view&id=18AMz4wqTMO0_PGrm66Ir8A0RRaZxVvJT';
 
@@ -444,6 +451,24 @@ function populateSel(){
   const ags=[...new Set([...listings.map(l=>l.agent),...listings.map(l=>l.agent2)].filter(Boolean))].sort();
   ags.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a+' — Individual Report';sel.appendChild(o);});
   sel.onchange=()=>{curAgent=sel.value||'all';build();};
+}
+
+function savePDF(){
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+  const ia = curAgent !== 'all';
+  const filename = `RLP_Commercial_${MONTH.replace(/\s+/g,'_')}${ia?'_'+curAgent.replace(/\s+/g,'-'):'_Full-Report'}.pdf`;
+  const opt = {
+    margin: [0.3, 0.3, 0.3, 0.3],
+    filename: filename,
+    image: { type:'jpeg', quality:0.98 },
+    html2canvas: { scale:2, useCORS:true, allowTaint:true, logging:false },
+    jsPDF: { unit:'in', format:[11,8.5], orientation:'landscape' },
+    pagebreak: { mode:'avoid-all', before:'.page' }
+  };
+  html2pdf().set(opt).from(document.getElementById('pages')).save()
+    .then(()=>{ btn.textContent='⬇ Save PDF'; btn.disabled=false; });
 }
 
 async function init(){
